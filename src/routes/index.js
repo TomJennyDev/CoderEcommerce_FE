@@ -1,0 +1,61 @@
+import * as React from "react";
+import { Route, Routes } from "react-router-dom";
+import BlankLayout from "../layouts/BlankLayout";
+import DashboardLayout from "../layouts/DashboardLayout";
+import MainLayout from "../layouts/MainLayout";
+import CheckoutPage from "../pages/CheckoutPage";
+import DashboardPage from "../pages/Dashboard/DashboardPage";
+import EditProductPage from "../pages/Dashboard/EditProductPage";
+import ProductPage from "../pages/Dashboard/ProductPage";
+import UserPage from "../pages/Dashboard/UserPage";
+import DetailPage from "../pages/DetailPage";
+import LoginPage from "../pages/LoginPage";
+import NotFoundPage from "../pages/NotFoundPage";
+import ProductsPage from "../pages/ProductsPage";
+import SearchPage from "../pages/SearchPage";
+import UserProfilePage from "../pages/UserProfilePage";
+import AuthRequire from "./AuthRequire";
+
+function Router() {
+  return (
+    <Routes>
+      <Route path="/" element={<MainLayout />}>
+        <Route index element={<SearchPage />} />
+        <Route
+          path="profile"
+          element={
+            <AuthRequire>
+              <UserProfilePage />
+            </AuthRequire>
+          }
+        />
+        <Route path="detail/:id" element={<DetailPage />} />
+        <Route path="category/:id" element={<SearchPage />} />
+        <Route path="category/" element={<SearchPage />} />
+        <Route
+          path="checkout"
+          element={
+            <AuthRequire>
+              <CheckoutPage />
+            </AuthRequire>
+          }
+        />
+        <Route path="wishlist" element={<ProductsPage />} />
+      </Route>
+      <Route element={<BlankLayout />}>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Route>
+
+      <Route path="/dashboard" element={<DashboardLayout />}>
+        <Route index element={<DashboardPage />} />
+        <Route path="products" element={<ProductPage />} />
+        <Route path="products/edit/:id" element={<EditProductPage />} />
+
+        <Route path="user" element={<UserPage />} />
+      </Route>
+    </Routes>
+  );
+}
+
+export default Router;

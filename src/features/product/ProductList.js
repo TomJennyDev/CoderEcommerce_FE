@@ -1,0 +1,25 @@
+// material
+import { Grid } from "@mui/material";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import ProductCard from "./ProductCard";
+import { getAllProducts } from "./productSlice";
+
+export default function ProductList() {
+  const dispatch = useDispatch();
+  let { products, filters } = useSelector((state) => state.product);
+
+  useEffect(() => {
+    dispatch(getAllProducts());
+  }, [filters]);
+
+  return (
+    <Grid container spacing={3} flexGrow="1">
+      {products.map((product) => (
+        <Grid key={product._id} item xs={12} sm={6} md={4}>
+          <ProductCard product={product} />
+        </Grid>
+      ))}
+    </Grid>
+  );
+}
