@@ -1,4 +1,6 @@
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
+import DifferenceIcon from "@mui/icons-material/Difference";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { Button, Chip, Rating, Stack } from "@mui/material";
 import Box from "@mui/material/Box";
@@ -24,8 +26,14 @@ import { useEffect } from "react";
 import "react-perfect-scrollbar/dist/css/styles.css";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, NavLink } from "react-router-dom";
+import SearchInput from "../../../components/SearchInput";
 import { fCurrency, fNumber } from "../../../utils/numberFormat";
-import { getAllProductsDashboard } from "../dashboardSlice";
+import ProductSort from "../../product/ProductSort";
+import {
+  getAllProductsDashboard,
+  handleChangeDashBoardFilters,
+} from "../dashboardSlice";
+
 const ButtonStyled = styled(Button)(({ theme }) => ({
   borderRadius: "50%",
   border: "1px solid",
@@ -62,7 +70,7 @@ function stableSort(array, comparator) {
     }
     return a[1] - b[1];
   });
-  console.log(array);
+
   return stabilizedThis.map((el) => el[0]);
 }
 
@@ -160,9 +168,11 @@ function EnhancedTableHead(props) {
 
 const EnhancedTableToolbar = (props) => {
   const dispatch = useDispatch();
-  const { isLoading } = useSelector((state) => state.cart);
   const { numSelected, selected, setSelected } = props;
-
+  const handleSubmit = (searchQuery) =>
+    dispatch(handleChangeDashBoardFilters({ title: searchQuery }));
+  const handleDispatch = (value) =>
+    dispatch(handleChangeDashBoardFilters(value));
   return (
     <Toolbar
       sx={{
@@ -191,7 +201,32 @@ const EnhancedTableToolbar = (props) => {
           direction="row"
           alignItems="center"
           sx={{ flex: "1 1 100%" }}
-        ></Stack>
+          spacing={2}
+        >
+          <SearchInput handleSubmit={handleSubmit} />
+          <ProductSort handleDispatch={handleDispatch} />
+        </Stack>
+      )}
+      {numSelected > 0 ? (
+        <Tooltip title="Clone Product">
+          <IconButton
+            component={NavLink}
+            to={`/dashboard/products/clone/${selected[0]}`}
+            onClick={() => setSelected([])}
+          >
+            <DifferenceIcon />
+          </IconButton>
+        </Tooltip>
+      ) : (
+        <Tooltip title="Add Product">
+          <IconButton
+            component={NavLink}
+            to={`/dashboard/products/add`}
+            onClick={() => setSelected([])}
+          >
+            <AddCircleIcon />
+          </IconButton>
+        </Tooltip>
       )}
 
       {numSelected > 0 ? (
@@ -282,7 +317,7 @@ export default function ProductTable() {
   useEffect(() => {
     const filters = { page: page + 1, limit: rowsPerPage };
     dispatch(getAllProductsDashboard(filters));
-  }, [page, rowsPerPage]);
+  }, [page, rowsPerPage, filters]);
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -309,7 +344,6 @@ export default function ProductTable() {
             <TableBody>
               {stableSort(products, getComparator(order, orderBy)).map(
                 (row, index) => {
-                  console.log(row);
                   const isItemSelected = isSelected(row._id);
                   const labelId = `enhanced-table-checkbox-${index}`;
 
@@ -363,27 +397,27 @@ export default function ProductTable() {
                           </Box>
                           <Typography
                             component={Link}
-                            to={`/detail/${row._id}`}
+                            to={`/detail/${row?._id}`}
                             variant="subtitle2"
                             color="initial"
                             sx={{ display: "inline-block", width: "70%" }}
                           >
-                            {row.title}
+                            {row?.title}
                           </Typography>
                         </Box>
                       </TableCell>
                       <TableCell align="left">
                         <Typography variant="subtitle1" color="initial">
-                          {row.categoryId.title}
+                          {row?.categoryId?.title}
                         </Typography>
                       </TableCell>
                       <TableCell align="right">
                         <Stack direction="row" alignItems="center">
                           <Rating
                             name="rating"
-                            value={row.rateAverage}
+                            value={row?.rateAverage}
                             precision={1}
-                            getLabelText={() => `${row.totalRatings}`}
+                            getLabelText={() => `${row?.totalRatings}`}
                             size="small"
                           />
                           <Typography
@@ -391,7 +425,7 @@ export default function ProductTable() {
                             noWrap
                             color="text.disabled"
                           >
-                            ({row.totalRatings})
+                            ({row?.totalRatings})
                           </Typography>
                         </Stack>
                       </TableCell>
@@ -404,10 +438,10 @@ export default function ProductTable() {
                             textDecoration: "line-through",
                           }}
                         >
-                          {fCurrency(row.price)}
+                          {fCurrency(row?.price)}
                         </Typography>
                         <Typography variant="subtitle1" color="initial">
-                          {fCurrency(row.priceSale)}
+                          {fCurrency(row?.priceSale)}
                         </Typography>
                       </TableCell>
                       <TableCell align="right">
@@ -418,7 +452,7 @@ export default function ProductTable() {
                           spacing={1}
                         >
                           <Typography variant="subtitle1" color="initial">
-                            {fNumber(row.quantity)}
+                            {fNumber(row?.quantity)}
                           </Typography>
                         </Stack>
                       </TableCell>

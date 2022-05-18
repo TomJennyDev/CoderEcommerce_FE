@@ -11,7 +11,6 @@ import UserPage from "../pages/Dashboard/UserPage";
 import DetailPage from "../pages/DetailPage";
 import LoginPage from "../pages/LoginPage";
 import NotFoundPage from "../pages/NotFoundPage";
-import ProductsPage from "../pages/ProductsPage";
 import SearchPage from "../pages/SearchPage";
 import UserProfilePage from "../pages/UserProfilePage";
 import AuthRequire from "./AuthRequire";
@@ -40,18 +39,25 @@ function Router() {
             </AuthRequire>
           }
         />
-        <Route path="wishlist" element={<ProductsPage />} />
       </Route>
       <Route element={<BlankLayout />}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
 
-      <Route path="/dashboard" element={<DashboardLayout />}>
+      <Route
+        path="/dashboard"
+        element={
+          <AuthRequire>
+            <DashboardLayout />
+          </AuthRequire>
+        }
+      >
         <Route index element={<DashboardPage />} />
         <Route path="products" element={<ProductPage />} />
         <Route path="products/edit/:id" element={<EditProductPage />} />
-
+        <Route path="products/add" element={<EditProductPage />} />
+        <Route path="products/clone/:id" element={<EditProductPage />} />
         <Route path="user" element={<UserPage />} />
       </Route>
     </Routes>

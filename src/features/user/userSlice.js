@@ -11,6 +11,7 @@ const initialState = {
   users: [],
   totalPage: 0,
   totalUsers: 0,
+  filters: {},
 };
 
 const slice = createSlice({
@@ -53,6 +54,16 @@ const slice = createSlice({
       state.totalUsers = action.payload.totalResults;
       state.users = action.payload.results;
     },
+    handleChangeUserFilters(state, action) {
+      state.isLoading = false;
+      state.error = null;
+      state.filters = { ...state.filters, ...action.payload };
+    },
+    handleClearUserFilters(state) {
+      state.isLoading = false;
+      state.error = null;
+      state.filters = {};
+    },
   },
 });
 
@@ -65,6 +76,8 @@ export const {
   getUserListSuccess,
   deactiveUserSuccess,
   updateUserSuccess,
+  handleChangeUserFilters,
+  handleClearUserFilters,
 } = slice.actions;
 export const updateUserProfile =
   ({
@@ -125,10 +138,12 @@ export const getCurrentUserProfile = () => async (dispatch) => {
   }
 };
 
-export const getUserList = () => async (dispatch) => {
+export const getUserList = (filters) => async (dispatch, getState) => {
   dispatch(startLoading());
   try {
-    const response = await apiService.get("/users");
+    filters = { ...filters, ...getState().user.filters };
+
+    const response = await apiService.get("/users", { params: filters });
     dispatch(getUserListSuccess(response.data));
   } catch (error) {
     dispatch(hasError(error));
@@ -153,8 +168,6 @@ export const deactiveUser = (id) => async (dispatch) => {
 export const updateUser = (id, updateContent) => async (dispatch) => {
   dispatch(startLoading());
   try {
-    console.log(updateContent);
-
     const repsonse = await apiService.put(`/users/update/${id}`, {
       ...updateContent,
     });

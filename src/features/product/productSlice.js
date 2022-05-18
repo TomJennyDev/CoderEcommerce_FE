@@ -76,7 +76,7 @@ export const getAllProducts = (filters) => async (dispatch, getState) => {
   dispatch(startLoading());
 
   filters = { ...filters, ...getState().product.filters };
-  console.log(filters);
+
   try {
     const response = await apiService.get("/product/public", {
       params: filters,

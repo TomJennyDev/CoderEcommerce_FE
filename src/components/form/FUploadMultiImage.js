@@ -1,8 +1,8 @@
 import { FormHelperText } from "@mui/material";
 import { Controller, useFormContext } from "react-hook-form";
-import UploadSingleFile from "../UploadSingleFile";
+import UploadMultiFile from "../UploadMultiFile";
 
-function FUploadImage({ name, idx, ...other }) {
+export function FUploadMultiFile({ name, ...other }) {
   const { control } = useFormContext();
 
   return (
@@ -10,20 +10,20 @@ function FUploadImage({ name, idx, ...other }) {
       name={name}
       control={control}
       render={({ field, fieldState: { error } }) => {
-        const checkError = !!error && !field.value;
+        const checkError = !!error && field.value?.length === 0;
+
         return (
-          <UploadSingleFile
+          <UploadMultiFile
             accept="image/*"
-            file={field.value[idx]}
+            files={field.value}
             error={checkError}
             helperText={
               checkError && (
                 <FormHelperText error sx={{ px: 2 }}>
-                  {error.message}
+                  {error?.message}
                 </FormHelperText>
               )
             }
-            sx={{ width: "150px", height: "320px" }}
             {...other}
           />
         );
@@ -31,5 +31,3 @@ function FUploadImage({ name, idx, ...other }) {
     />
   );
 }
-
-export default FUploadImage;

@@ -93,9 +93,14 @@ export default function CategoriesMenu() {
     setAnchorEl(null);
     setHovered(false);
   };
-  const handlePopoverOpen = (event, id) => {
+  const handlePopoverOpen = (event, id, children) => {
     dispatch(getSubCategories(id));
-    setHovered(true);
+    console.log(children);
+    if (children.length > 0) {
+      setHovered(true);
+    } else {
+      setHovered(false);
+    }
   };
 
   const handleSetFilters = async (categoryId) => {
@@ -152,7 +157,9 @@ export default function CategoriesMenu() {
               aria-owns={open ? "mouse-over-popover" : undefined}
               aria-haspopup="true"
               sx={{ p: 1 }}
-              onMouseEnter={(e) => handlePopoverOpen(e, cate._id)}
+              onMouseEnter={(e) =>
+                handlePopoverOpen(e, cate._id, cate.children)
+              }
             >
               {arrIcon[idx]}
               <Typography

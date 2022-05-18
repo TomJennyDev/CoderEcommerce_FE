@@ -8,7 +8,6 @@ import { Revenue } from "../../components/dashboard/dashboard/Revenue";
 import TotalCustomers from "../../components/dashboard/dashboard/TotalCustomers";
 import TotalOrder from "../../components/dashboard/dashboard/TotalOrder";
 import TotalProducts from "../../components/dashboard/dashboard/TotalProducts";
-import { TrafficByDevice } from "../../components/dashboard/dashboard/traffic-by-device";
 import { getReportsDashboard } from "../../features/dashboard/dashboardSlice";
 
 export default function Dashboard() {
@@ -38,11 +37,8 @@ export default function Dashboard() {
               sx={{ height: "100%" }}
             />
           </Grid>
-          <Grid item lg={8} md={12} xl={9} xs={12}>
+          <Grid item lg={8} md={12} xl={12} xs={12}>
             <Order />
-          </Grid>
-          <Grid item lg={4} md={6} xl={3} xs={12}>
-            <TrafficByDevice sx={{ height: "100%" }} />
           </Grid>
           <Grid item lg={4} md={6} xl={4} xs={12}>
             <LatestProducts sx={{ height: "100%" }} />

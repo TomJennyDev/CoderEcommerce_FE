@@ -5,11 +5,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { REACT_APP_LIMIT } from "../app/config";
 import PaginationBar from "../components/PaginationBar";
-import ProductCartWidget from "../features/product/ProductCartWidget";
 import ProductFilterSidebar from "../features/product/ProductFilterSidebar";
 import ProductList from "../features/product/ProductList";
 import ProductSidebar from "../features/product/ProductSidebar";
-import { getAllProducts } from "../features/product/productSlice";
+import {
+  getAllProducts,
+  handleChangeFilters,
+} from "../features/product/productSlice";
 import ProductSort from "../features/product/ProductSort";
 import useResponsive from "../hooks/useResponsive";
 
@@ -22,6 +24,9 @@ export default function SearchPage() {
   const [openFilter, setOpenFilter] = useState(false);
   const [page, setPage] = useState(1);
 
+  const handleDispatch = (value) => {
+    dispatch(handleChangeFilters(value));
+  };
   const handleOpenFilter = () => {
     setOpenFilter(true);
   };
@@ -31,9 +36,6 @@ export default function SearchPage() {
   };
   useEffect(() => {
     let pagination = { page, limit: Number(REACT_APP_LIMIT) };
-    // if (categoryId) {
-    //   pagination = { ...pagination, categoryId };
-    // }
     dispatch(getAllProducts(pagination));
   }, [dispatch, page]);
 
@@ -53,7 +55,7 @@ export default function SearchPage() {
           onCloseFilter={handleCloseFilter}
         />
         <Stack direction="row" spacing={1} flexShrink={0} sx={{ my: 1 }}>
-          <ProductSort />
+          <ProductSort handleDispatch={handleDispatch} />
         </Stack>
       </Stack>
 
@@ -76,7 +78,6 @@ export default function SearchPage() {
           </Stack>
         </Grid>
       </Grid>
-      <ProductCartWidget />
     </Container>
   );
 }

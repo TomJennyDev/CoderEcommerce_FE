@@ -23,7 +23,7 @@ export default function TotalProducts({ totalProducts }) {
       return acc;
     }, {});
   }
-  console.log(totalProducts);
+
   return (
     <Card>
       <CardContent>

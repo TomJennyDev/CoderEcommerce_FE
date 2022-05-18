@@ -1,10 +1,8 @@
-import GradingIcon from "@mui/icons-material/Grading";
-import PaymentIcon from "@mui/icons-material/Payment";
-import { Button, Divider, Paper, Stack, Typography } from "@mui/material";
+import { Divider, Paper, Stack, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import { fCurrency } from "../utils/numberFormat";
 
-function CheckoutSumSideBar({ calSubTotal, register, step }) {
+function CheckoutSumSideBar({ calSubTotal }) {
   return (
     <Box component={Paper} spacing={3} sx={{ width: 1, p: 2 }}>
       <Stack direction="row" justifyContent="space-Between" spacing={2}>
@@ -44,15 +42,6 @@ function CheckoutSumSideBar({ calSubTotal, register, step }) {
         <Typography variant="h6" textAlign="center">
           {fCurrency(calSubTotal?.total)}
         </Typography>
-      </Stack>
-      <Stack sx={{ py: 3 }}>
-        <Button
-          type="submit"
-          variant="contained"
-          startIcon={step === "Payment" ? <PaymentIcon /> : <GradingIcon />}
-        >
-          {step}
-        </Button>
       </Stack>
     </Box>
   );

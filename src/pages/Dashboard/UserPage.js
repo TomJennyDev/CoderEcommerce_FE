@@ -24,9 +24,11 @@ import * as React from "react";
 import { useEffect } from "react";
 import { FaFacebookF, FaGoogle } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
+import SearchInput from "../../components/SearchInput";
 import {
   deactiveUser,
   getUserList,
+  handleChangeUserFilters,
   updateUser,
 } from "../../features/user/userSlice";
 import { TitleStyle } from "../../theme/customizations/TitleStyle";
@@ -171,9 +173,11 @@ function EnhancedTableHead(props) {
 
 const EnhancedTableToolbar = (props) => {
   const dispatch = useDispatch();
-  const { users } = useSelector((state) => state.user);
+  const { users, filters } = useSelector((state) => state.user);
   const { numSelected, selected, setSelected } = props;
   const user = users.find((user) => user._id === selected[0] && user.isDeleted);
+  const handleSubmit = (searchQuery) =>
+    dispatch(handleChangeUserFilters({ name: searchQuery }));
 
   return (
     <Toolbar
@@ -199,11 +203,9 @@ const EnhancedTableToolbar = (props) => {
           {numSelected} selected
         </Typography>
       ) : (
-        <Stack
-          direction="row"
-          alignItems="center"
-          sx={{ flex: "1 1 100%" }}
-        ></Stack>
+        <Stack direction="row" alignItems="center" sx={{ flex: "1 1 100%" }}>
+          <SearchInput handleSubmit={handleSubmit} />
+        </Stack>
       )}
 
       {numSelected > 0 && user ? (
@@ -235,7 +237,9 @@ const EnhancedTableToolbar = (props) => {
 };
 
 export default function UserPage() {
-  const { users, isLoading, totalUsers } = useSelector((state) => state.user);
+  const { users, isLoading, totalUsers, filters } = useSelector(
+    (state) => state.user
+  );
   const dispatch = useDispatch();
 
   const [order, setOrder] = React.useState("asc");
@@ -300,7 +304,7 @@ export default function UserPage() {
   useEffect(() => {
     const filters = { page: page + 1, limit: rowsPerPage };
     dispatch(getUserList(filters));
-  }, [selected]);
+  }, [selected, filters]);
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -411,14 +415,15 @@ export default function UserPage() {
                             <AvatarGroup max={2}>
                               {user?.facebookId && (
                                 <Avatar
-                                  src={<FaFacebookF />}
                                   alt="Facebook"
                                   sx={{
                                     bgcolor: "success.main",
                                     width: 35,
                                     height: 35,
                                   }}
-                                />
+                                >
+                                  <FaFacebookF />
+                                </Avatar>
                               )}
 
                               {user?.googleId && (

@@ -1,23 +1,11 @@
-import React, { useState } from "react";
-import {
-  Link,
-  Stack,
-  Alert,
-  IconButton,
-  InputAdornment,
-  Container,
-} from "@mui/material";
-import { LoadingButton } from "@mui/lab";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-
-import { useNavigate, useLocation, Link as RouterLink } from "react-router-dom";
-
-import { FCheckbox, FormProvider, FTextField } from "../../components/form";
-
-import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { LoadingButton } from "@mui/lab";
+import { Alert, Container, Link, Stack } from "@mui/material";
+import React from "react";
+import { useForm } from "react-hook-form";
+import { useLocation, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
+import { FormProvider, FTextField } from "../../components/form";
 import useAuth from "../../hooks/useAuth";
 
 const LoginSchema = Yup.object().shape({

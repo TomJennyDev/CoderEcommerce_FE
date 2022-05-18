@@ -42,7 +42,7 @@ const styledAppbar = (isScroll, isDashboard) => ({
 });
 
 function MainHeader({ onOpenSidebar }) {
-  const { user, logout } = useAuth();
+  const { user, logout, isAuthenticated } = useAuth();
 
   const { totalProduct } = useSelector((state) => state.cart);
 
@@ -110,24 +110,27 @@ function MainHeader({ onOpenSidebar }) {
       </Box>
 
       <Divider sx={{ borderStyle: "dashed" }} />
+      {isAuthenticated && (
+        <Box>
+          <MenuItem
+            onClick={handleMenuClose}
+            to="/"
+            component={RouterLink}
+            sx={{ mx: 1 }}
+          >
+            My Profile
+          </MenuItem>
 
-      <MenuItem
-        onClick={handleMenuClose}
-        to="/"
-        component={RouterLink}
-        sx={{ mx: 1 }}
-      >
-        My Profile
-      </MenuItem>
-
-      <MenuItem
-        onClick={handleMenuClose}
-        to="/account"
-        component={RouterLink}
-        sx={{ mx: 1 }}
-      >
-        Account Settings
-      </MenuItem>
+          <MenuItem
+            onClick={handleMenuClose}
+            to="/account"
+            component={RouterLink}
+            sx={{ mx: 1 }}
+          >
+            Account Settings
+          </MenuItem>
+        </Box>
+      )}
       {user?.role === "admin" && (
         <MenuItem
           onClick={handleMenuClose}

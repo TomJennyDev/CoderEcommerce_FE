@@ -102,8 +102,6 @@ function AuthProvider({ children }) {
         if (accessToken && isValidToken(accessToken)) {
           await setSession(accessToken);
 
-          console.log("1");
-
           const response = await apiService.get("/users/me");
           const user = response.data;
 
@@ -206,7 +204,6 @@ function AuthProvider({ children }) {
       access_token: res.accessToken,
     });
     const { user, accessToken } = response.data;
-    console.log(response);
 
     setSession(accessToken);
     dispatchCart(getTotalProducts(user?.cartId?.totalItem));

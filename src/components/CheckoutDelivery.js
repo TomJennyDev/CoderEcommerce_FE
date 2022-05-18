@@ -1,8 +1,16 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import { Container, Grid, Paper, Stack, Typography } from "@mui/material";
+import PaymentIcon from "@mui/icons-material/Payment";
+import {
+  Button,
+  Container,
+  Grid,
+  Paper,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { Box } from "@mui/system";
-import React, { useEffect } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import * as yup from "yup";
@@ -79,9 +87,6 @@ function CheckoutDelivery({ setActiveStep }) {
     setActiveStep((step) => step + 1);
   };
 
-  useEffect(() => {
-    return;
-  }, []);
   return (
     <Container>
       <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
@@ -126,6 +131,15 @@ function CheckoutDelivery({ setActiveStep }) {
           </Grid>
           <Grid item xs={12} md={4}>
             <CheckoutSumSideBar calSubTotal={calSubTotal} step={"Payment"} />
+            <Stack sx={{ py: 3 }}>
+              <Button
+                type="submit"
+                variant="contained"
+                startIcon={<PaymentIcon />}
+              >
+                Payment
+              </Button>
+            </Stack>
           </Grid>
         </Grid>
       </FormProvider>

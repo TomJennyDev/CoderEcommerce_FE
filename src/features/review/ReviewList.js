@@ -44,7 +44,6 @@ function ReviewList({ productId }) {
   } else if (isLoading) {
     renderReviews = <LoadingScreen />;
   }
-  console.log(renderReviews);
 
   return (
     <Stack spacing={1.5}>

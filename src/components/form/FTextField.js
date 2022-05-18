@@ -8,16 +8,20 @@ function FTextField({ name, ...other }) {
     <Controller
       name={name}
       control={control}
-      render={({ field, fieldState: { error } }) => (
-        <TextField
-          variant="standard"
-          {...field}
-          fullWidth
-          error={!!error}
-          helperText={error?.message}
-          {...other}
-        />
-      )}
+      render={({ field, fieldState: { error } }) => {
+        const { value, ...restfield } = field;
+        return (
+          <TextField
+            variant="standard"
+            value={value || ""}
+            {...restfield}
+            fullWidth
+            error={!!error}
+            helperText={error?.message}
+            {...other}
+          />
+        );
+      }}
     />
   );
 }

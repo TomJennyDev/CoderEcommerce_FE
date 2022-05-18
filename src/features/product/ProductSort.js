@@ -5,7 +5,6 @@ import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { FormProvider, FSelect } from "../../components/form";
-import { handleChangeFilters } from "./productSlice";
 
 export const SORT_BY_OPTIONS = [
   { value: "", label: "Sort" },
@@ -19,7 +18,7 @@ export const SORT_BY_OPTIONS = [
 const defaultValues = {
   sortBy: "",
 };
-export default function ProductSort() {
+export default function ProductSort({ handleDispatch }) {
   const { filters } = useSelector((state) => state.product);
 
   const dispatch = useDispatch();
@@ -31,7 +30,7 @@ export default function ProductSort() {
     if (!filters.sortBy) {
       reset();
     }
-    const subscription = watch((value) => dispatch(handleChangeFilters(value)));
+    const subscription = watch((value) => handleDispatch(value));
     return () => subscription.unsubscribe();
   }, [watch, filters.sortBy]);
 

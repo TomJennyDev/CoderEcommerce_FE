@@ -73,7 +73,6 @@ function Login({ setCurrentTab }) {
   };
 
   const loginWithGoogle = async (response) => {
-    console.log(response);
     await auth.loginGoogle(response, () => {
       navigate(from, { replace: true });
     });

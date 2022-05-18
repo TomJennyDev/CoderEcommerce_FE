@@ -32,7 +32,7 @@ export function Revenue({ revenues }) {
               revenue
             </Typography>
             <Typography color="textPrimary" variant="h4">
-              {fCurrency(revenueCurrent?.total)}
+              {fCurrency(revenueCurrent?.total / 1000) + "K"}
             </Typography>
           </Grid>
           <Grid item>

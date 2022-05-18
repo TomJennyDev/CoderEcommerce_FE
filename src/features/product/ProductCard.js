@@ -13,7 +13,9 @@ import { useState } from "react";
 import { FaAngleDoubleDown } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import Label from "../../components/Label";
+import useAuth from "../../hooks/useAuth";
 import { fCurrency } from "../../utils/numberFormat";
 import { updateQuantityProductCart } from "../cart/cartSlice";
 import { sendReviewReaction } from "./productSlice";
@@ -38,6 +40,7 @@ const CardStyed = styled(Card)(({ theme }) => ({
 
 export default function ProductCard({ product }) {
   const dispatch = useDispatch();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const {
     _id,
@@ -119,8 +122,14 @@ export default function ProductCard({ product }) {
             value={valueRating}
             precision={1}
             onChange={(event, newValue) => {
-              setRating(newValue);
-              dispatch(sendReviewReaction({ productId: _id, rate: +newValue }));
+              if (!isAuthenticated) {
+                toast.error(`Please login for rating!`);
+              } else {
+                setRating(newValue);
+                dispatch(
+                  sendReviewReaction({ productId: _id, rate: +newValue })
+                );
+              }
             }}
             getLabelText={getLabelText}
             size="small"
@@ -151,14 +160,18 @@ export default function ProductCard({ product }) {
           <IconButton
             aria-label="delete"
             size="medium"
-            onClick={() =>
-              dispatch(
-                updateQuantityProductCart({
-                  productId: _id,
-                  action: true,
-                })
-              )
-            }
+            onClick={() => {
+              if (!isAuthenticated) {
+                toast.error(`Please login for add to Cart!`);
+              } else {
+                dispatch(
+                  updateQuantityProductCart({
+                    productId: _id,
+                    action: true,
+                  })
+                );
+              }
+            }}
           >
             <ShoppingCartCheckoutIcon fontSize="inherit" />
           </IconButton>

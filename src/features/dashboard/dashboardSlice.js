@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import apiService from "../../app/apiService";
+import { cloudinaryUpload } from "../../utils/cloudinary";
 
 const initialState = {
   isLoading: false,
@@ -35,6 +36,7 @@ const slice = createSlice({
     getProductDashBoardSuccess(state, action) {
       state.isLoading = false;
       state.error = null;
+
       state.product = action.payload;
     },
     getProductsDashboardSuccess(state, action) {
@@ -51,6 +53,24 @@ const slice = createSlice({
       state.orders = action.payload.results;
       state.totalPage = action.payload.totalPageOrder;
     },
+    createProductDashBoardSuccess(state) {
+      state.isLoading = false;
+      state.error = null;
+    },
+    updateProductDashBoardSuccess(state) {
+      state.isLoading = false;
+      state.error = null;
+    },
+    handleChangeDashBoardFilters(state, action) {
+      state.isLoading = false;
+      state.error = null;
+      state.filters = { ...state.filters, ...action.payload };
+    },
+    handleClearDashBoardFilters(state) {
+      state.isLoading = false;
+      state.error = null;
+      state.filters = {};
+    },
   },
 });
 
@@ -62,19 +82,25 @@ export const {
   getOrdersDashboardSuccess,
   getReportsDashboardSuccess,
   getProductDashBoardSuccess,
+  createProductDashBoardSuccess,
+  updateProductDashBoardSuccess,
+  handleClearDashBoardFilters,
+  handleChangeDashBoardFilters,
   hasError,
 } = slice.actions;
 
 export const getAllProductsDashboard =
   (filters) => async (dispatch, getState) => {
     dispatch(startLoading());
-    console.log(filters);
-
     try {
+      filters = {
+        sortBy: "updatedAt.desc",
+        ...filters,
+        ...getState().dashboard.filters,
+      };
       const response = await apiService.get("/product", {
         params: filters,
       });
-      console.log(response);
 
       if (response) {
         dispatch(getProductsDashboardSuccess(response.data));
@@ -119,8 +145,57 @@ export const getProductDashboard = (id) => async (dispatch) => {
 
   try {
     const response = await apiService.get(`/product/${id}`);
-    if (response) {
+    if (response.success) {
       dispatch(getProductDashBoardSuccess(response.data));
+    }
+  } catch (error) {
+    dispatch(hasError(error));
+    toast.error(error.message);
+  }
+};
+
+export const createProductDashboard = (data) => async (dispatch) => {
+  dispatch(startLoading());
+  try {
+    let imageUrl = [];
+    await Promise.all(
+      data.imageFile.map(async (file) => {
+        let result = await cloudinaryUpload(file);
+        imageUrl.push(result);
+      })
+    );
+    data.imageUrls = [...data.imageUrls, ...imageUrl];
+
+    const response = await apiService.post(`/product/create`, { ...data });
+
+    if (response) {
+      dispatch(createProductDashBoardSuccess(response.data));
+    }
+  } catch (error) {
+    dispatch(hasError(error));
+    toast.error(error.message);
+  }
+};
+
+export const updateProductDashboard = (id, data) => async (dispatch) => {
+  dispatch(startLoading());
+  try {
+    console.log(data);
+    let imageUrl = [];
+    await Promise.all(
+      data.imageFile.map(async (file) => {
+        let result = await cloudinaryUpload(file);
+        imageUrl.push(result);
+      })
+    );
+    data.imageUrls = [...data.imageUrls, ...imageUrl];
+
+    const response = await apiService.put(`/product/update/${id}`, {
+      ...data,
+    });
+
+    if (response) {
+      dispatch(updateProductDashBoardSuccess());
     }
   } catch (error) {
     dispatch(hasError(error));

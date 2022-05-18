@@ -79,6 +79,7 @@ export const getCart = () => async (dispatch) => {
   dispatch(startLoading());
   try {
     const response = await apiService.get("/cart/me");
+
     if (response) {
       dispatch(getCartSuccess(response.data));
     }
@@ -92,7 +93,9 @@ export const updateCart = (cart) => async (dispatch) => {
   dispatch(startLoading());
   try {
     const response = await apiService.put(`/cart/me/update`, { ...cart });
-    dispatch(updateCartSuccess(response.data));
+    if (response) {
+      dispatch(updateCartSuccess(response.data));
+    }
   } catch (error) {
     dispatch(hasError(error));
     toast.error(error.message);

@@ -1,7 +1,9 @@
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import FactCheckIcon from "@mui/icons-material/FactCheck";
+import GradingIcon from "@mui/icons-material/Grading";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import PaymentIcon from "@mui/icons-material/Payment";
 import {
   Avatar,
   Box,
@@ -30,14 +32,14 @@ function CheckoutSummary() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const handleCheckout = async () => {
+  const handleCheckout = () => {
     const order = {
       cartId: cart._id,
       shipping,
       payment,
       products,
     };
-    await dispatch(createOrder(order));
+    dispatch(createOrder(order));
     navigate("/");
   };
   return (
@@ -70,7 +72,7 @@ function CheckoutSummary() {
             <Stack
               component={Paper}
               spacing={1}
-              sx={{ p: 2, minHeight: " 290px" }}
+              sx={{ p: 2, minHeight: " 300px" }}
             >
               <Avatar
                 sx={{ bgcolor: "primary.main", m: 1, width: 56, height: 56 }}
@@ -97,7 +99,7 @@ function CheckoutSummary() {
             <Stack
               component={Paper}
               spacing={1}
-              sx={{ p: 2, minHeight: " 290px" }}
+              sx={{ p: 2, minHeight: " 300px" }}
             >
               <Avatar
                 sx={{ bgcolor: "success.main", m: 1, width: 56, height: 56 }}
@@ -138,7 +140,7 @@ function CheckoutSummary() {
             <Stack
               component={Paper}
               spacing={1}
-              sx={{ p: 2, minHeight: " 290px" }}
+              sx={{ p: 2, minHeight: " 300px" }}
             >
               <Avatar
                 sx={{ bgcolor: "secondary.main", m: 1, width: 56, height: 56 }}
@@ -190,6 +192,12 @@ function CheckoutSummary() {
         </Grid>
       </Stack>
       <CheckOutSumTable />
+      <Stack sx={{ py: 3 }}>
+        <Button type="submit" variant="contained" startIcon={<GradingIcon />}>
+          Summary
+        </Button>
+      </Stack>
+      <PaymentIcon />
     </Container>
   );
 }

@@ -1,20 +1,28 @@
 import { yupResolver } from "@hookform/resolvers/yup";
+import GradingIcon from "@mui/icons-material/Grading";
 import PaymentsIcon from "@mui/icons-material/Payments";
-import { Container, Grid, Paper, Stack, Typography } from "@mui/material";
+import {
+  Button,
+  Container,
+  Grid,
+  Paper,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { Box } from "@mui/system";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import * as yup from "yup";
+import { updateCart } from "../features/cart/cartSlice";
 import { TitleStyle } from "../theme/customizations/TitleStyle";
 import CheckoutSumSideBar from "./CheckoutSumSideBar";
 import { FormProvider, FRadioGroup, FTextField } from "./form";
 
-const DeliverySchema = yup.object().shape({
-  method: yup.string().required("method is required"),
-  cardNumber: yup.string().required("cardNumber is required"),
+const PaymentSchema = yup.object().shape({
+  method: yup.string(),
+  cardNumber: yup.number().required("cardNumber is required"),
   expMonth: yup.string().required("expMonth is required"),
-  expYear: yup.string().required("expYear is required"),
   cardCVV: yup.string().required("cardCVV is required"),
   cardIssuer: yup.string().required("cardIssuer is required"),
 });
@@ -22,30 +30,28 @@ const DeliverySchema = yup.object().shape({
 export const methodPayment = ["CreditCards", "Cash", "BankOnline"];
 
 function CheckoutPayment({ setActiveStep }) {
-  let defaultValues = {
-    method: "CreditCards",
-    cardNumber: "",
-    expMonth: "",
-    expYear: "",
-    cardCVV: "",
-    cardIssuer: "",
-  };
   const dispatch = useDispatch();
-  const { cart, products } = useSelector((state) => state.cart);
-  const { payment } = cart;
-  // const { method, creditCards } = payment;
+  const { cart } = useSelector((state) => state.cart);
+
+  const defaultValues = {
+    method: cart?.payment?.method || "CreditCards",
+    cardNumber: cart?.payment?.creditCards?.cardNumber || 0,
+    expMonth: cart?.payment?.creditCards?.expMonth || "",
+    cardCVV: cart?.payment?.creditCards?.cardCVV || "",
+    cardIssuer: cart?.payment?.creditCards?.cardIssuer || "",
+  };
 
   const methods = useForm({
     defaultValues,
-    resolver: yupResolver(DeliverySchema),
+    resolver: yupResolver(PaymentSchema),
   });
   const { handleSubmit } = methods;
 
   const onSubmit = (data) => {
-    console.log(data);
-    // const cart = {};
-    // await dispatch(updateCart());
-    // setActiveStep((step) => step + 1);
+    const { method, ...restData } = data;
+    const cart = { payment: { method: method, creditCards: restData } };
+    dispatch(updateCart(cart));
+    setActiveStep((step) => step + 1);
   };
 
   return (
@@ -78,10 +84,16 @@ function CheckoutPayment({ setActiveStep }) {
             </Box>
           </Grid>
           <Grid item xs={12} md={4}>
-            <CheckoutSumSideBar
-              calSubTotal={cart?.payment?.total}
-              step={"Summary"}
-            />
+            <CheckoutSumSideBar calSubTotal={cart?.payment?.total} />
+            <Stack sx={{ py: 3 }}>
+              <Button
+                type="submit"
+                variant="contained"
+                startIcon={<GradingIcon />}
+              >
+                Summary
+              </Button>
+            </Stack>
           </Grid>
         </Grid>
       </FormProvider>

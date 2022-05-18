@@ -3,19 +3,23 @@ import AddBoxIcon from "@mui/icons-material/AddBox";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import CategoryIcon from "@mui/icons-material/Category";
 import { Box, Button, Stack, Tab, Tabs, Typography } from "@mui/material";
-import { styled } from "@mui/material/styles";
 import { capitalCase } from "change-case";
-import React, { useEffect, useState } from "react";
+import { concat } from "lodash";
+import React, { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import * as yup from "yup";
 import { FormProvider } from "../../components/form";
+import LoadingScreen from "../../components/LoadingScreen";
 import { getAllCategories } from "../../features/category/categorySlice";
-import { getProductDashboard } from "../../features/dashboard/dashboardSlice";
+import {
+  createProductDashboard,
+  getProductDashboard,
+  updateProductDashboard,
+} from "../../features/dashboard/dashboardSlice";
 import ProductForm from "../../features/dashboard/Product/ProductForm";
 import ProductUpLoadImg from "../../features/dashboard/Product/ProductUploadImg";
-import useResponsive from "../../hooks/useResponsive";
 import { TitleStyle } from "../../theme/customizations/TitleStyle";
 
 const schema = yup.object({
@@ -28,38 +32,53 @@ const schema = yup.object({
   descriptions: yup.string().required(),
   categoryId: yup.string().required(),
   isDeleted: yup.boolean(),
+  imageUrls: null,
+  imageFile: null,
 });
-
-const TabsWrapperStyle = styled("div")(({ theme }) => ({
-  display: "flex",
-  justifyContent: "center",
-  paddingBottom: theme.spacing(2),
-}));
+const PROFILE_TABS = [
+  {
+    value: "Product",
+    icon: <AddBoxIcon sx={{ fontSize: 24 }} />,
+  },
+  {
+    value: "Images",
+    icon: <CameraAltIcon sx={{ fontSize: 24 }} />,
+  },
+];
 
 function EditProductPage() {
-  const dispatch = useDispatch();
-  const smUp = useResponsive("up", "sm");
-  const mdUp = useResponsive("up", "md");
   const { id } = useParams();
-  const { product } = useSelector((state) => state.dashboard);
+  const location = useLocation();
+  const isAdd = location?.pathname.includes("add");
+  const isClone = location?.pathname.includes("clone");
+
+  const [currentTab, setCurrentTab] = useState("Product");
+
+  const dispatch = useDispatch();
+  const { product, isLoading } = useSelector((state) => state.dashboard);
   const { categories } = useSelector((state) => state.category);
 
+  const handleChangeTab = (newValue) => {
+    setCurrentTab(newValue);
+  };
+
   const defaultValues = {
-    sku: product?.sku || "",
-    title: product?.title || "",
-    status: product?.status || "new",
-    price: product?.price || 0,
-    discount: product?.discount || 0,
-    quantity: product?.quantity || 0,
-    descriptions: product?.descriptions?.content || "",
-    categoryId: product?.categoryId || "",
-    isDeleted: product?.isDeleted || true,
+    sku: isAdd ? "" : product?.sku,
+    title: isAdd ? "" : product?.title,
+    status: isAdd ? "new" : product?.status,
+    price: isAdd ? 0 : product?.price,
+    discount: isAdd ? 0 : product?.discount,
+    quantity: isAdd ? 0 : product?.quantity,
+    descriptions: isAdd ? "" : product?.descriptions?.content,
+    categoryId: isAdd ? "" : product?.categoryId,
+    isDeleted: isAdd ? false : product?.isDeleted,
+    imageUrls: isAdd ? [] : product?.imageUrls,
+    imageFile: [],
   };
   console.log(defaultValues);
 
   const methods = useForm({
     defaultValues,
-
     resolver: yupResolver(schema),
   });
   const {
@@ -67,41 +86,68 @@ function EditProductPage() {
     register,
     setValue,
     watch,
+    getValues,
+    reset,
     formState: { errors },
   } = methods;
 
   const editorContent = watch("descriptions");
 
   const onEditorStateChange = (editorState) => {
-    console.log(editorState);
     setValue("descriptions", editorState);
+  };
+
+  const handleDrop = useCallback(
+    (acceptedFiles) => {
+      let values = getValues("imageFile");
+      const newImageUrl = acceptedFiles.map((file) =>
+        Object.assign(file, {
+          preview: URL.createObjectURL(file),
+        })
+      );
+
+      values = concat(values, newImageUrl);
+      setValue("imageFile", values);
+    },
+    [setValue]
+  );
+
+  const handleRemoveAll = () => {
+    setValue("imageFile", []);
+    setValue("imageUrls", []);
+  };
+
+  const handleRemove = (file) => {
+    let imageFile = getValues("imageFile");
+    let imageUrls = getValues("imageUrls");
+
+    imageFile = imageFile.filter((_file) => _file !== file);
+
+    imageUrls = imageUrls.filter((_file) => _file !== file);
+
+    setValue("imageFile", imageFile);
+    setValue("imageUrls", imageUrls);
   };
 
   const onSubmit = (data) => {
     console.log(data);
+    if (id && !isClone) {
+      dispatch(updateProductDashboard(id, data));
+    } else {
+      dispatch(createProductDashboard(data));
+    }
   };
-
-  const [currentTab, setCurrentTab] = useState("Product");
-
-  const handleChangeTab = (newValue) => {
-    setCurrentTab(newValue);
-  };
-
-  const PROFILE_TABS = [
-    {
-      value: "Product",
-      icon: <AddBoxIcon sx={{ fontSize: 24 }} />,
-    },
-    {
-      value: "Images",
-      icon: <CameraAltIcon sx={{ fontSize: 24 }} />,
-    },
-  ];
 
   useEffect(() => {
-    if (id) dispatch(getProductDashboard(id));
+    if (id) {
+      dispatch(getProductDashboard(id));
+    }
     dispatch(getAllCategories());
   }, [dispatch, id]);
+
+  useEffect(() => {
+    reset(defaultValues);
+  }, [product]);
 
   useEffect(() => {
     register("descriptions", { required: true });
@@ -163,21 +209,30 @@ function EditProductPage() {
                 ))}
               </Tabs>
             </Box>
-            <Box sx={{ px: 0.5, py: 2 }}>
-              {currentTab === "Product" && (
-                <ProductForm
-                  categories={categories}
-                  product={product}
-                  setCurrentTab={setCurrentTab}
-                  editorContent={editorContent}
-                  onEditorStateChange={onEditorStateChange}
-                  errors={errors}
-                />
-              )}
-              {currentTab === "Images" && (
-                <ProductUpLoadImg setCurrentTab={setCurrentTab} />
-              )}
-            </Box>
+            {isLoading ? (
+              <LoadingScreen />
+            ) : (
+              <Box sx={{ px: 0.5, py: 2 }}>
+                {currentTab === "Product" && (
+                  <ProductForm
+                    categories={categories}
+                    product={product}
+                    setCurrentTab={setCurrentTab}
+                    editorContent={editorContent}
+                    onEditorStateChange={onEditorStateChange}
+                    errors={errors}
+                  />
+                )}
+                {currentTab === "Images" && (
+                  <ProductUpLoadImg
+                    setCurrentTab={setCurrentTab}
+                    handleDrop={handleDrop}
+                    handleRemoveAll={handleRemoveAll}
+                    handleRemove={handleRemove}
+                  />
+                )}
+              </Box>
+            )}
           </Stack>
         </Box>
       </FormProvider>

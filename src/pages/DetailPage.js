@@ -18,11 +18,13 @@ import { styled } from "@mui/system";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link as RouterLink, useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import LoadingScreen from "../components/LoadingScreen";
 import { updateQuantityProductCart } from "../features/cart/cartSlice";
 import ProductSimilar from "../features/product/ProductSimilar";
 import { getProduct } from "../features/product/productSlice";
 import ProductTabs from "../features/product/ProductTabs";
+import useAuth from "../hooks/useAuth";
 import { fCurrency } from "../utils/numberFormat";
 
 const ProductImgStyle = styled("img")(({ theme }) => ({
@@ -73,6 +75,7 @@ const ProductImgChildStyle = styled("img")(({ theme }) => ({
 function DetailPage() {
   const params = useParams();
   const { id } = params;
+  const { isAuthenticated } = useAuth();
   const dispatch = useDispatch();
   const { isLoading: isLoadingCart } = useSelector((state) => state.cart);
   const [imgUrl, setImgUrl] = useState(0);
@@ -219,15 +222,19 @@ function DetailPage() {
                             </Box>
                             <Button
                               variant="contained"
-                              onClick={() =>
-                                dispatch(
-                                  updateQuantityProductCart({
-                                    productId: id,
-                                    action: true,
-                                  })
-                                )
-                              }
-                              loading={isLoadingCart}
+                              onClick={() => {
+                                if (!isAuthenticated) {
+                                  toast.error(`Please login for add to Cart!`);
+                                } else {
+                                  dispatch(
+                                    updateQuantityProductCart({
+                                      productId: id,
+                                      action: true,
+                                    })
+                                  );
+                                }
+                              }}
+                              loading={!!isLoadingCart}
                               disabled={
                                 product?.inventoryStatus !== "available"
                               }

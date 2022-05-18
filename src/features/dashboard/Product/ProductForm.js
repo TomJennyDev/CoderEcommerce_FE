@@ -11,8 +11,8 @@ Quill.register("modules/imageResize", ImageResize);
 
 const STATUS = ["sale", "new", "comming soon"];
 const HIDDEN = [
-  { value: true, label: "show" },
-  { value: false, label: "hide" },
+  { value: false, label: "show" },
+  { value: true, label: "hide" },
 ];
 
 const ProductImgStyle = styled("img")(({ theme }) => ({
@@ -138,9 +138,7 @@ function ProductForm({
               bounds={"#root"}
             />
           </Stack>
-          <p className="Error">
-            {errors.descriptions && "Enter valid content"}
-          </p>
+          <p>{errors.descriptions && "Enter valid content"}</p>
         </Stack>
       </Grid>
     </Grid>

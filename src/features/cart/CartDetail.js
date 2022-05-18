@@ -62,7 +62,7 @@ function getComparator(order, orderBy) {
 // need to support IE11, you can use Array.prototype.sort() directly
 function stableSort(array, comparator) {
   const stabilizedThis = array?.map((el, index) => [el, index]);
-  console.log(stabilizedThis);
+
   stabilizedThis.sort((a, b) => {
     const order = comparator(a[0], b[0]);
     if (order !== 0) {
@@ -308,7 +308,7 @@ export default function CartDetail() {
       },
     };
     dispatch(updateCart(cart));
-  }, []);
+  }, [dispatch]);
 
   return (
     <Box sx={{ width: "100%" }}>

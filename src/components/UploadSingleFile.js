@@ -1,10 +1,9 @@
+import AddAPhotoRoundedIcon from "@mui/icons-material/AddAPhotoRounded";
+import { Box, Stack, Typography } from "@mui/material";
+import { styled } from "@mui/material/styles";
 import isString from "lodash/isString";
 import { useDropzone } from "react-dropzone";
-
-import { styled } from "@mui/material/styles";
-import { Box, Stack, Typography } from "@mui/material";
 import RejectionFiles from "./RejectionFiles";
-import AddAPhotoRoundedIcon from "@mui/icons-material/AddAPhotoRounded";
 
 const DropZoneStyle = styled("div")(({ theme }) => ({
   outline: "none",
@@ -19,7 +18,14 @@ const DropZoneStyle = styled("div")(({ theme }) => ({
   "&:hover": { opacity: 0.72, cursor: "pointer" },
 }));
 
-function UploadSingleFile({ error = false, file, helperText, sx, ...other }) {
+function UploadSingleFile({
+  error = false,
+  file,
+  helperText,
+  sx,
+
+  ...other
+}) {
   const {
     getRootProps,
     getInputProps,
@@ -27,7 +33,7 @@ function UploadSingleFile({ error = false, file, helperText, sx, ...other }) {
     isDragReject,
     fileRejections,
   } = useDropzone({
-    multiple: false,
+    multiple: true,
     ...other,
   });
 
@@ -56,15 +62,19 @@ function UploadSingleFile({ error = false, file, helperText, sx, ...other }) {
           alignItems="center"
           sx={{ height: "100%" }}
         >
-          <AddAPhotoRoundedIcon />
-          <Typography
-            gutterBottom
-            variant="body2"
-            sx={{ color: "#637381" }}
-            textAlign="center"
-          >
-            Drop or Select Image
-          </Typography>
+          {!file && (
+            <>
+              <AddAPhotoRoundedIcon />
+              <Typography
+                gutterBottom
+                variant="body2"
+                sx={{ color: "#637381" }}
+                textAlign="center"
+              >
+                Drop or Select Image
+              </Typography>
+            </>
+          )}
         </Stack>
 
         {file && (

@@ -2,19 +2,23 @@ import SendIcon from "@mui/icons-material/Send";
 import { Avatar, IconButton, Stack, TextField } from "@mui/material";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
+import { toast } from "react-toastify";
 import useAuth from "../../hooks/useAuth";
 import { createReview } from "./reviewSlice";
 
 function ReviewForm({ productId }) {
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const [comments, setComments] = useState("");
   const dispatch = useDispatch();
-  console.log("ấdasdasd");
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(createReview({ productId, comments }));
-    setComments("");
+    if (!isAuthenticated) {
+      toast.error("Please login for write a review");
+    } else {
+      dispatch(createReview({ productId, comments }));
+      setComments("");
+    }
   };
 
   return (
