@@ -226,7 +226,7 @@ const EnhancedTableToolbar = (props) => {
 };
 
 export default function CartDetail() {
-  const { products, isLoading } = useSelector((state) => state.cart);
+  const { products, isLoading, cart } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
 
   const [order, setOrder] = React.useState("asc");
@@ -302,12 +302,11 @@ export default function CartDetail() {
   );
 
   useEffect(() => {
-    const cart = {
-      payment: {
-        total: { ...calSubTotal, tax: 10 },
-      },
+    const cartUpdate = {
+      ...cart,
+      payment: { ...cart.payment, total: { ...calSubTotal, tax: 10 } },
     };
-    dispatch(updateCart(cart));
+    dispatch(updateCart(cartUpdate));
   }, [dispatch]);
 
   return (

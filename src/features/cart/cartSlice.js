@@ -35,12 +35,16 @@ const slice = createSlice({
       state.cart = action.payload;
     },
     getTotalProducts(state, action) {
+      state.isLoading = false;
+      state.error = null;
       state.totalProduct = action.payload;
     },
     clearTotalProducts(state) {
       state.totalProduct = 0;
     },
     updateProductToCartSuccess(state, action) {
+      state.isLoading = false;
+      state.error = null;
       state.totalProduct = action.payload.totalProduct;
 
       state.products = state.products.map((cartProduct) => {
@@ -54,6 +58,8 @@ const slice = createSlice({
     },
 
     removeProductCartSuccess(state, action) {
+      state.isLoading = false;
+      state.error = null;
       state.totalProduct = action.payload.totalProduct;
 
       const { products } = action.payload;

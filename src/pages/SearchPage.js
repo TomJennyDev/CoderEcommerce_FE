@@ -66,8 +66,9 @@ export default function SearchPage() {
           </Grid>
         )}
         <Grid item xs={12} md={12} lg={9}>
-          <Stack spacing={3}>
+          <Stack spacing={3} justifyContent="space-between">
             <ProductList />
+
             <Stack alignItems="flex-end">
               <PaginationBar
                 totalPage={+totalPage}

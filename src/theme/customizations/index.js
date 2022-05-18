@@ -4,6 +4,7 @@ import CssBaseline from "./CssBaseline";
 import Input from "./Input";
 import Link from "./Link";
 import Paper from "./Paper";
+import Skeleton from "./Skeleton";
 import Tooltip from "./Tooltip";
 import Typography from "./Typography";
 
@@ -17,6 +18,7 @@ function customizeComponents(theme) {
     ...Backdrop(theme),
     ...Typography(theme),
     ...CssBaseline(theme),
+    ...Skeleton(theme),
   };
 }
 

@@ -14,7 +14,7 @@ export default function ProductList() {
   }, [filters]);
 
   return (
-    <Grid container spacing={3} flexGrow="1">
+    <Grid container spacing={3}>
       {products.map((product) => (
         <Grid key={product._id} item xs={12} sm={6} md={4}>
           <ProductCard product={product} />

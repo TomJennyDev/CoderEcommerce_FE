@@ -1,4 +1,5 @@
 import LocalMallIcon from "@mui/icons-material/LocalMall";
+import LockOpenIcon from "@mui/icons-material/LockOpen";
 import {
   AppBar,
   Avatar,
@@ -110,27 +111,27 @@ function MainHeader({ onOpenSidebar }) {
       </Box>
 
       <Divider sx={{ borderStyle: "dashed" }} />
-      {isAuthenticated && (
-        <Box>
-          <MenuItem
-            onClick={handleMenuClose}
-            to="/"
-            component={RouterLink}
-            sx={{ mx: 1 }}
-          >
-            My Profile
-          </MenuItem>
 
-          <MenuItem
-            onClick={handleMenuClose}
-            to="/account"
-            component={RouterLink}
-            sx={{ mx: 1 }}
-          >
-            Account Settings
-          </MenuItem>
-        </Box>
-      )}
+      <Box>
+        <MenuItem
+          onClick={handleMenuClose}
+          to="/"
+          component={RouterLink}
+          sx={{ mx: 1 }}
+        >
+          My Profile
+        </MenuItem>
+
+        <MenuItem
+          onClick={handleMenuClose}
+          to="/account"
+          component={RouterLink}
+          sx={{ mx: 1 }}
+        >
+          Account Settings
+        </MenuItem>
+      </Box>
+
       {user?.role === "admin" && (
         <MenuItem
           onClick={handleMenuClose}
@@ -184,7 +185,7 @@ function MainHeader({ onOpenSidebar }) {
                   </IconButton>
                 )}
                 {mdUp && (
-                  <Box sx={{ width: 320, m: 0, p: 0 }}>
+                  <Box sx={{ width: 280, m: 0, p: 0 }}>
                     <Link to="/">
                       <img
                         src={logoImg2}
@@ -205,22 +206,40 @@ function MainHeader({ onOpenSidebar }) {
             ></Typography>
 
             <Box sx={{ flexGrow: 1 }} />
+
             <Stack direction="row" spacing={3}>
-              <Badge badgeContent={totalProduct} color="primary">
+              {!isAuthenticated ? (
                 <Avatar
-                  onClick={handleOpenCart}
+                  onClick={() => navigate("/login")}
                   alt="Cart"
-                  sx={{ width: 32, height: 32, cursor: "pointer" }}
+                  sx={{
+                    width: 32,
+                    height: 32,
+                    cursor: "pointer",
+                    "&:hover": { backgroundColor: "primary.main" },
+                  }}
                 >
-                  <LocalMallIcon />
+                  <LockOpenIcon />
                 </Avatar>
-              </Badge>
-              <Avatar
-                onClick={handleProfileMenuOpen}
-                src={user?.avatarUrl}
-                alt={user?.name}
-                sx={{ width: 32, height: 32, cursor: "pointer" }}
-              />
+              ) : (
+                <>
+                  <Badge badgeContent={totalProduct} color="primary">
+                    <Avatar
+                      onClick={handleOpenCart}
+                      alt="Cart"
+                      sx={{ width: 32, height: 32, cursor: "pointer" }}
+                    >
+                      <LocalMallIcon />
+                    </Avatar>
+                  </Badge>
+                  <Avatar
+                    onClick={handleProfileMenuOpen}
+                    src={user?.avatarUrl}
+                    alt={user?.name}
+                    sx={{ width: 32, height: 32, cursor: "pointer" }}
+                  />
+                </>
+              )}
             </Stack>
           </Toolbar>
         </Box>

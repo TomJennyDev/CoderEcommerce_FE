@@ -33,6 +33,7 @@ function CheckoutPayment({ setActiveStep }) {
   const dispatch = useDispatch();
   const { cart } = useSelector((state) => state.cart);
 
+  console.log(cart.payment);
   const defaultValues = {
     method: cart?.payment?.method || "CreditCards",
     cardNumber: cart?.payment?.creditCards?.cardNumber || 0,
@@ -49,8 +50,12 @@ function CheckoutPayment({ setActiveStep }) {
 
   const onSubmit = (data) => {
     const { method, ...restData } = data;
-    const cart = { payment: { method: method, creditCards: restData } };
-    dispatch(updateCart(cart));
+    console.log(data);
+    const cartUpdate = {
+      ...cart,
+      payment: { method, creditCards: restData, total: cart.payment.total },
+    };
+    dispatch(updateCart(cartUpdate));
     setActiveStep((step) => step + 1);
   };
 

@@ -53,19 +53,6 @@ function CheckoutDelivery({ setActiveStep }) {
   };
 
   defaultValues = shipping || defaultValues;
-  const calSubTotal = products.reduce(
-    (acc, curr, index, arr) => {
-      acc.subTotal = acc.subTotal + curr.productId.priceSale * curr.quantity;
-      acc.shipping = acc.shipping + curr.productId.shipping * curr.quantity;
-      if (index === arr.length - 1) {
-        acc.subTotal = acc.subTotal / arr.length;
-        acc.shipping = acc.shipping / arr.length;
-        acc.total = acc.subTotal + (acc.subTotal * 10) / 100 + acc.shipping;
-      }
-      return acc;
-    },
-    { subTotal: 0, shipping: 0, total: 0 }
-  );
 
   let methods = useForm({
     defaultValues,
@@ -74,16 +61,14 @@ function CheckoutDelivery({ setActiveStep }) {
   });
   const { handleSubmit, reset } = methods;
 
-  const onSubmit = async (data) => {
-    const cart = {
-      payment: {
-        total: { ...calSubTotal, tax: 10 },
-      },
+  const onSubmit = (data) => {
+    const cartUpdate = {
+      ...cart,
       shipping: data,
       status: "Delivery",
     };
 
-    await dispatch(updateCart(cart));
+    dispatch(updateCart(cartUpdate));
     setActiveStep((step) => step + 1);
   };
 
@@ -130,7 +115,7 @@ function CheckoutDelivery({ setActiveStep }) {
             </Box>
           </Grid>
           <Grid item xs={12} md={4}>
-            <CheckoutSumSideBar calSubTotal={calSubTotal} step={"Payment"} />
+            <CheckoutSumSideBar calSubTotal={cart?.payment?.total} />
             <Stack sx={{ py: 3 }}>
               <Button
                 type="submit"
