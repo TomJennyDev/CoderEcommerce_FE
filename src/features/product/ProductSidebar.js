@@ -133,7 +133,14 @@ function ProductSidebar({ onCloseFilter, isOpenFilter }) {
                 {categories?.map((cate, idx) => {
                   return (
                     <List component="div" disablePadding key={cate._id}>
-                      <ListItemButton sx={{ pl: 4 }}>
+                      <ListItemButton
+                        sx={{ pl: 4 }}
+                        onClick={() =>
+                          dispatch(
+                            handleChangeFilters({ categoryId: cate._id })
+                          )
+                        }
+                      >
                         <ListItemIcon>{arrIcon[idx]}</ListItemIcon>
                         <ListItemText primary={cate.title} />
                       </ListItemButton>

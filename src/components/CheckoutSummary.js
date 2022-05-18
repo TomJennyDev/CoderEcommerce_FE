@@ -1,9 +1,7 @@
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
 import FactCheckIcon from "@mui/icons-material/FactCheck";
-import GradingIcon from "@mui/icons-material/Grading";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
-import PaymentIcon from "@mui/icons-material/Payment";
 import {
   Avatar,
   Box,
@@ -192,12 +190,6 @@ function CheckoutSummary() {
         </Grid>
       </Stack>
       <CheckOutSumTable />
-      <Stack sx={{ py: 3 }}>
-        <Button type="submit" variant="contained" startIcon={<GradingIcon />}>
-          Summary
-        </Button>
-      </Stack>
-      <PaymentIcon />
     </Container>
   );
 }
