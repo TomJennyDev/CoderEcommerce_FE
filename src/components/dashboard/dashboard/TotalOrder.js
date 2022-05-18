@@ -14,20 +14,17 @@ import { fNumber } from "../../../utils/numberFormat";
 export default function TotalOrder({ totalOrders }) {
   const date = new Date();
   const curentMonth = date.getMonth() + 1;
-  let orderCurrent = [];
-  if (totalOrders?.length == 1) {
-    orderCurrent = totalOrders;
-  } else {
-    orderCurrent = totalOrders?.reduce((acc, curr, idx, arr) => {
-      if (curr.month === curentMonth) acc.count = curr?.count;
-      if (curr.month === curentMonth - 1) acc.countLastMonth = curr?.count;
-      if (arr.length - 1 === idx) {
-        acc.percent = (acc.count * 100) / acc.countLastMonth;
-      }
-      return acc;
-    }, {});
-  }
 
+  const orderCurrent = totalOrders?.reduce((acc, curr, idx, arr) => {
+    if (curr.month === curentMonth) acc.count = curr?.count;
+    if (curr.month === curentMonth - 1) acc.countLastMonth = curr?.count;
+    if (arr.length - 1 === idx) {
+      acc.percent = (acc.count * 100) / acc.countLastMonth;
+    }
+    return acc;
+  }, {});
+
+  console.log(totalOrders);
   return (
     <Card sx={{ height: "100%" }}>
       <CardContent>

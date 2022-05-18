@@ -15,7 +15,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Link,
   Link as RouterLink,
@@ -24,6 +24,8 @@ import {
 } from "react-router-dom";
 import Iconify from "../components/Iconify";
 import Logo from "../components/Logo";
+import SearchHeader from "../components/SearchHeader";
+import { handleChangeFilters } from "../features/product/productSlice";
 import useAuth from "../hooks/useAuth";
 import useResponsive from "../hooks/useResponsive";
 import logoImg2 from "../logo2.png";
@@ -43,6 +45,7 @@ const styledAppbar = (isScroll, isDashboard) => ({
 });
 
 function MainHeader({ onOpenSidebar }) {
+  const dispatch = useDispatch();
   const { user, logout, isAuthenticated } = useAuth();
 
   const { totalProduct } = useSelector((state) => state.cart);
@@ -59,6 +62,9 @@ function MainHeader({ onOpenSidebar }) {
   const [anchorEl, setAnchorEl] = React.useState(null);
 
   const isMenuOpen = Boolean(anchorEl);
+
+  const handleDispatch = (searchQuery) =>
+    dispatch(handleChangeFilters({ title: searchQuery }));
 
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -164,82 +170,90 @@ function MainHeader({ onOpenSidebar }) {
       >
         <Box maxWidth="lg" sx={{ px: 0, mx: "auto", width: 1 }}>
           <Toolbar>
-            {isDashboard ? (
-              <IconButton
-                onClick={onOpenSidebar}
-                sx={{ mr: 1, color: "text.primary", display: { lg: "none" } }}
-              >
-                <Iconify icon="ri:menu-2-fill" />
-              </IconButton>
-            ) : (
-              <>
-                {mdDown && (
-                  <IconButton
-                    size="large"
-                    edge="start"
-                    color="inherit"
-                    aria-label="open drawer"
-                    sx={{ mr: 2 }}
-                  >
-                    <Logo />
-                  </IconButton>
-                )}
-                {mdUp && (
-                  <Box sx={{ width: 280, m: 0, p: 0 }}>
-                    <Link to="/">
-                      <img
-                        src={logoImg2}
-                        alt="logo"
-                        width="100%"
-                        height="100%"
-                      />
-                    </Link>
-                  </Box>
-                )}
-              </>
-            )}
-            <Typography
-              variant="h6"
-              noWrap
-              component="div"
-              sx={{ display: { xs: "none", sm: "block" } }}
-            ></Typography>
-
-            <Box sx={{ flexGrow: 1 }} />
-
-            <Stack direction="row" spacing={3}>
-              {!isAuthenticated ? (
-                <Avatar
-                  onClick={() => navigate("/login")}
-                  alt="Cart"
-                  sx={{
-                    width: 32,
-                    height: 32,
-                    cursor: "pointer",
-                    "&:hover": { backgroundColor: "primary.main" },
-                  }}
+            <Stack
+              alignItems="center"
+              justifyContent="space-between"
+              direction="row"
+              sx={{ flexGrow: 1 }}
+            >
+              {isDashboard ? (
+                <IconButton
+                  onClick={onOpenSidebar}
+                  sx={{ mr: 1, color: "text.primary", display: { lg: "none" } }}
                 >
-                  <LockOpenIcon />
-                </Avatar>
+                  <Iconify icon="ri:menu-2-fill" />
+                </IconButton>
               ) : (
                 <>
-                  <Badge badgeContent={totalProduct} color="primary">
-                    <Avatar
-                      onClick={handleOpenCart}
-                      alt="Cart"
-                      sx={{ width: 32, height: 32, cursor: "pointer" }}
+                  {mdDown && (
+                    <IconButton
+                      size="large"
+                      edge="start"
+                      color="inherit"
+                      aria-label="open drawer"
+                      sx={{ mr: 2 }}
                     >
-                      <LocalMallIcon />
-                    </Avatar>
-                  </Badge>
-                  <Avatar
-                    onClick={handleProfileMenuOpen}
-                    src={user?.avatarUrl}
-                    alt={user?.name}
-                    sx={{ width: 32, height: 32, cursor: "pointer" }}
-                  />
+                      <Logo />
+                    </IconButton>
+                  )}
+                  {mdUp && (
+                    <Box sx={{ width: 280, m: 0, p: 0, height: "100%" }}>
+                      <Link to="/">
+                        <img
+                          src={logoImg2}
+                          alt="logo"
+                          width="100%"
+                          height="100%"
+                        />
+                      </Link>
+                    </Box>
+                  )}
                 </>
               )}
+
+              {isScroll && !isDashboard && (
+                <SearchHeader handleDispatch={handleDispatch} />
+              )}
+
+              <Stack
+                direction="row"
+                spacing={3}
+                justifyContent="flex-end"
+                sx={{ width: 280, flexGrow: isDashboard && 1 }}
+              >
+                {!isAuthenticated ? (
+                  <Avatar
+                    onClick={() => navigate("/login")}
+                    alt="Cart"
+                    sx={{
+                      width: 32,
+                      height: 32,
+                      cursor: "pointer",
+                      "&:hover": { backgroundColor: "primary.main" },
+                    }}
+                  >
+                    <LockOpenIcon />
+                  </Avatar>
+                ) : (
+                  <>
+                    <Badge badgeContent={totalProduct} color="primary">
+                      <Avatar
+                        onClick={handleOpenCart}
+                        alt="Cart"
+                        sx={{ width: 32, height: 32, cursor: "pointer" }}
+                      >
+                        <LocalMallIcon />
+                      </Avatar>
+                    </Badge>
+                    <Avatar
+                      onClick={handleProfileMenuOpen}
+                      src={user?.avatarUrl}
+                      alt={user?.name}
+                      sx={{ width: 32, height: 32, cursor: "pointer" }}
+                    />
+                  </>
+                )}
+              </Stack>
             </Stack>
           </Toolbar>
         </Box>

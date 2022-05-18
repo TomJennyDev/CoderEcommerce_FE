@@ -71,7 +71,7 @@ export function Revenue({ revenues }) {
             }}
             variant="body2"
           >
-            {fNumber(revenueCurrent?.percent)} %
+            {fNumber(revenueCurrent?.percent)}%
           </Typography>
           <Typography color="textSecondary" variant="caption">
             Since last month

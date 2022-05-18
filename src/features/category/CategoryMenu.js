@@ -95,7 +95,7 @@ export default function CategoriesMenu() {
   };
   const handlePopoverOpen = (event, id, children) => {
     dispatch(getSubCategories(id));
-    console.log(children);
+
     if (children.length > 0) {
       setHovered(true);
     } else {
@@ -136,7 +136,13 @@ export default function CategoriesMenu() {
         onClick={handleClick}
         startIcon={<WidgetsIcon />}
         endIcon={anchorEl ? <KeyboardArrowDownIcon /> : <ChevronRightIcon />}
-        sx={{ width: 250, textAlign: "left", textTransform: "capitalize" }}
+        sx={{
+          width: 250,
+          textAlign: "left",
+          textTransform: "capitalize",
+          color: "grey[500_8]",
+          borderColor: "grey[500_8]",
+        }}
       >
         <Typography style={{ margin: 0, flexGrow: 1 }}>Categories</Typography>
       </Button>

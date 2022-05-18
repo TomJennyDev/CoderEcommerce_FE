@@ -104,12 +104,13 @@ function AuthProvider({ children }) {
 
           const response = await apiService.get("/users/me");
           const user = response.data;
+          console.log(user);
+          dispatchCart(getTotalProducts(user?.cartId?.totalItem));
 
           dispatch({
             type: INITIALIZE,
             payload: { isAuthenticated: true, user },
           });
-          dispatchCart(getTotalProducts(user?.cartId?.totalItem));
         } else {
           setSession(null);
 
@@ -145,11 +146,13 @@ function AuthProvider({ children }) {
     const { user, accessToken } = response.data;
 
     setSession(accessToken);
+    console.log(user?.cartId?.totalItem);
+    dispatchCart(getTotalProducts(user?.cartId?.totalItem));
+
     dispatch({
       type: LOGIN_SUCCESS,
       payload: { user },
     });
-    dispatchCart(getTotalProducts(user?.cartId?.totalItem));
     callback();
   };
 
