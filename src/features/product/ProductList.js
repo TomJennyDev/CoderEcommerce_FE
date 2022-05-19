@@ -7,8 +7,8 @@ import { getAllProducts } from "./productSlice";
 
 export default function ProductList() {
   const dispatch = useDispatch();
-  let { products, filters } = useSelector((state) => state.product);
-
+  let { products, filters, isLoading } = useSelector((state) => state.product);
+  products = products || [1, 2, 3, 4, 5, 6];
   useEffect(() => {
     dispatch(getAllProducts());
   }, [filters]);
@@ -27,9 +27,10 @@ export default function ProductList() {
           }}
         >{`No results found`}</Alert>
       )}
+
       {products.map((product) => (
         <Grid key={product._id} item xs={12} sm={6} md={4}>
-          <ProductCard product={product} />
+          <ProductCard product={product} isLoading={isLoading} />
         </Grid>
       ))}
     </Grid>

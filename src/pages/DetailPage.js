@@ -19,7 +19,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link as RouterLink, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import LoadingScreen from "../components/LoadingScreen";
+import { default as SkeletonLoading } from "../components/Skeleton";
 import { updateQuantityProductCart } from "../features/cart/cartSlice";
 import ProductSimilar from "../features/product/ProductSimilar";
 import { getProduct } from "../features/product/productSlice";
@@ -99,158 +99,178 @@ function DetailPage() {
         </Typography>
       </Breadcrumbs>
       <Box sx={{ position: "relative", height: 1, minHeight: "500px" }}>
-        {isLoading ? (
-          <LoadingScreen />
+        {error ? (
+          <Alert severity="error">{error}</Alert>
         ) : (
           <>
-            {error ? (
-              <Alert severity="error">{error}</Alert>
-            ) : (
+            {product ? (
               <>
-                {product ? (
-                  <>
-                    <Grid container spacing={2} sx={{ minHeight: "500px" }}>
-                      <Grid item xs={12} md={4} sx={{ height: "500px" }}>
-                        <Stack
-                          direction="column"
-                          justifyContent="space-between"
-                          sx={{ height: "100%" }}
-                        >
-                          <ContainerImage>
-                            <ProductImgStyle
-                              alt={product?.title}
-                              src={product?.imageUrls?.[imgUrl]}
-                            />
-                          </ContainerImage>
-                          <Stack
-                            direction="row"
-                            sx={{ maxheight: "30%", p: 2 }}
-                            spacing={2}
-                            justifyContent="center"
-                          >
-                            {product?.imageUrls?.slice(0, 3).map((img, idx) => {
-                              return (
-                                <ContainerChildImage
-                                  onClick={() => setImgUrl(idx)}
-                                  key={idx}
-                                >
-                                  {!isLoading && (
-                                    <ProductImgChildStyle
-                                      alt={product?.title}
-                                      src={img}
-                                    />
-                                  )}
-                                </ContainerChildImage>
-                              );
-                            })}
-                          </Stack>
-                        </Stack>
-                      </Grid>
-                      <Grid item xs={12} md={8}>
-                        <Box sx={{ p: 2 }}>
-                          <Chip
-                            avatar={<NewReleasesIcon />}
-                            label={product?.status}
-                            sx={{
-                              mt: 2,
-                              mb: 1,
-                              background:
-                                product?.status === "sale"
-                                  ? "linear-gradient(to right, #f12711, #f5af19)"
-                                  : "linear-gradient(to left, #009fff, #ec2f4b)",
-                              textTransform: "uppercase",
-                              "& .MuiChip-avatar": {
-                                color: "white",
-                              },
-                            }}
-                            color="info"
-                            size="medium"
+                <Grid container spacing={2} sx={{ minHeight: "500px" }}>
+                  <Grid item xs={12} md={4} sx={{ height: "500px" }}>
+                    <Stack
+                      direction="column"
+                      justifyContent="space-between"
+                      sx={{ height: "100%" }}
+                    >
+                      <SkeletonLoading
+                        isLoading={isLoading}
+                        style={{ minHeight: "320px" }}
+                        width="100%"
+                      >
+                        <ContainerImage>
+                          <ProductImgStyle
+                            alt={product?.title}
+                            src={product?.imageUrls?.[imgUrl]}
+                          />
+                        </ContainerImage>
+                      </SkeletonLoading>
+                      <Stack
+                        direction="row"
+                        sx={{ maxheight: "30%", p: 2 }}
+                        spacing={2}
+                        justifyContent="center"
+                      >
+                        {product?.imageUrls?.slice(0, 3).map((img, idx) => {
+                          return (
+                            <ContainerChildImage
+                              onClick={() => setImgUrl(idx)}
+                              key={idx}
+                            >
+                              <SkeletonLoading
+                                isLoading={isLoading}
+                                width="80px"
+                                height="80px"
+                              >
+                                {!isLoading && (
+                                  <ProductImgChildStyle
+                                    alt={product?.title}
+                                    src={img}
+                                  />
+                                )}
+                              </SkeletonLoading>
+                            </ContainerChildImage>
+                          );
+                        })}
+                      </Stack>
+                    </Stack>
+                  </Grid>
+                  <Grid item xs={12} md={8}>
+                    <Box sx={{ p: 2 }}>
+                      <SkeletonLoading
+                        isLoading={isLoading}
+                        width="80px"
+                        height="30px"
+                      >
+                        <Chip
+                          avatar={<NewReleasesIcon />}
+                          label={product?.status}
+                          sx={{
+                            mt: 2,
+                            mb: 1,
+                            background:
+                              product?.status === "sale"
+                                ? "linear-gradient(to right, #f12711, #f5af19)"
+                                : "linear-gradient(to left, #009fff, #ec2f4b)",
+                            textTransform: "uppercase",
+                            "& .MuiChip-avatar": {
+                              color: "white",
+                            },
+                          }}
+                          color="info"
+                          size="medium"
+                        />
+                      </SkeletonLoading>
+                      <Typography variant="h5" paragraph>
+                        <SkeletonLoading isLoading={isLoading}>
+                          {product?.title}
+                        </SkeletonLoading>
+                      </Typography>
+                      <Stack
+                        direction="row"
+                        alignItems="center"
+                        spacing={1}
+                        sx={{ mb: 2 }}
+                      >
+                        <SkeletonLoading isLoading={isLoading}>
+                          <Rating
+                            value={product?.rateAverage}
+                            precision={0.1}
+                            readOnly
                           />
 
-                          <Typography variant="h5" paragraph>
-                            {product?.title}
-                          </Typography>
-                          <Stack
-                            direction="row"
-                            alignItems="center"
-                            spacing={1}
-                            sx={{ mb: 2 }}
+                          <Typography
+                            variant="body2"
+                            sx={{ color: "text.secondary" }}
                           >
-                            <Rating
-                              value={product?.rateAverage}
-                              precision={0.1}
-                              readOnly
-                            />
-                            <Typography
-                              variant="body2"
-                              sx={{ color: "text.secondary" }}
-                            >
-                              ({product?.totalRatings} reviews)
-                            </Typography>
-                          </Stack>
-                          <Typography variant="h4" sx={{ mb: 1 }}>
-                            <Box
-                              component="span"
-                              sx={{
-                                color: "text.disabled",
-                                textDecoration: "line-through",
-                              }}
-                            >
-                              {product?.price && fCurrency(product?.price)}
-                            </Box>
-                            &nbsp;{fCurrency(product?.priceSale)}
+                            ({product?.totalRatings} reviews)
                           </Typography>
-
-                          <Box direction="column">
-                            <Box>
-                              <Chip
-                                //   avatar={<NewReleasesIcon />}
-                                label={product?.inventoryStatus}
-                                sx={{
-                                  mt: 2,
-                                  mb: 1,
-
-                                  textTransform: "uppercase",
-                                  "& .MuiChip-avatar": {
-                                    color: "white",
-                                  },
-                                }}
-                                color="info"
-                                size="medium"
-                                variant="outlined"
-                              />
-                            </Box>
-                            <Button
-                              variant="contained"
-                              onClick={() => {
-                                if (!isAuthenticated) {
-                                  toast.error(`Please login for add to Cart!`);
-                                } else {
-                                  dispatch(
-                                    updateQuantityProductCart({
-                                      productId: id,
-                                      action: true,
-                                    })
-                                  );
-                                }
-                              }}
-                              loading={!!isLoadingCart}
-                              disabled={
-                                product?.inventoryStatus !== "available"
-                              }
-                              startIcon={<ShoppingCartIcon />}
-                            >
-                              Add to Cart
-                            </Button>
+                        </SkeletonLoading>
+                      </Stack>
+                      <Typography variant="h4" sx={{ mb: 1 }}>
+                        <SkeletonLoading isLoading={isLoading}>
+                          <Box
+                            component="span"
+                            sx={{
+                              color: "text.disabled",
+                              textDecoration: "line-through",
+                            }}
+                          >
+                            {product?.price && fCurrency(product?.price)}
                           </Box>
+                          &nbsp;{fCurrency(product?.priceSale)}
+                        </SkeletonLoading>
+                      </Typography>
+
+                      <Box direction="column">
+                        <Box>
+                          <SkeletonLoading isLoading={isLoading}>
+                            <Chip
+                              //   avatar={<NewReleasesIcon />}
+                              label={product?.inventoryStatus}
+                              sx={{
+                                mt: 2,
+                                mb: 1,
+
+                                textTransform: "uppercase",
+                                "& .MuiChip-avatar": {
+                                  color: "white",
+                                },
+                              }}
+                              color="info"
+                              size="medium"
+                              variant="outlined"
+                            />
+                          </SkeletonLoading>
                         </Box>
-                      </Grid>
-                    </Grid>
-                  </>
-                ) : (
-                  <Typography variant="h6">Product not found!</Typography>
-                )}
+                        <SkeletonLoading isLoading={isLoading}>
+                          <Button
+                            variant="contained"
+                            onClick={() => {
+                              if (!isAuthenticated) {
+                                toast.error(`Please login for add to Cart!`);
+                              } else {
+                                dispatch(
+                                  updateQuantityProductCart({
+                                    productId: id,
+                                    action: true,
+                                  })
+                                );
+                              }
+                            }}
+                            loading={!!isLoadingCart}
+                            disabled={product?.inventoryStatus !== "available"}
+                            startIcon={<ShoppingCartIcon />}
+                          >
+                            Add to Cart
+                          </Button>
+                        </SkeletonLoading>
+                      </Box>
+                    </Box>
+                  </Grid>
+                </Grid>
               </>
+            ) : (
+              <Typography variant="h6">Product not found!</Typography>
             )}
           </>
         )}
