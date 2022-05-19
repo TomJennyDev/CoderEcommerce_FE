@@ -64,7 +64,7 @@ export default function ProductCard({ product, isLoading }) {
     <Card>
       <SkeletonLoading
         isLoading={isLoading}
-        style={{ width: "100%", minHeight: "270px", padding: "10px" }}
+        style={{ width: "100%", minHeight: "270px" }}
       >
         <Box
           sx={{ pt: "100%", position: "relative", cursor: "pointer" }}

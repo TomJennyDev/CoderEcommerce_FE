@@ -3,12 +3,14 @@ import { Alert, Grid } from "@mui/material";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ProductCard from "./ProductCard";
+import ProductCardSkeleton from "./ProductSkeleton";
 import { getAllProducts } from "./productSlice";
 
 export default function ProductList() {
   const dispatch = useDispatch();
   let { products, filters, isLoading } = useSelector((state) => state.product);
-  products = products || [1, 2, 3, 4, 5, 6];
+  products = isLoading ? Array.from(Array(9).keys()) : products;
+
   useEffect(() => {
     dispatch(getAllProducts());
   }, [filters]);
@@ -30,7 +32,11 @@ export default function ProductList() {
 
       {products.map((product) => (
         <Grid key={product._id} item xs={12} sm={6} md={4}>
-          <ProductCard product={product} isLoading={isLoading} />
+          {isLoading ? (
+            <ProductCardSkeleton />
+          ) : (
+            <ProductCard product={product} isLoading={isLoading} />
+          )}
         </Grid>
       ))}
     </Grid>

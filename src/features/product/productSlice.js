@@ -37,6 +37,7 @@ const slice = createSlice({
       state.error = null;
       state.product = action.payload;
     },
+
     handleChangeFilters(state, action) {
       state.isLoading = false;
       state.error = null;
@@ -69,6 +70,7 @@ export const {
   getAllProductsSuccess,
   getProductSuccess,
   sendProductReactionSuccess,
+  clearProduct,
   hasError,
 } = slice.actions;
 
@@ -95,8 +97,9 @@ export const getProduct = (id) => async (dispatch) => {
 
   try {
     const response = await apiService.get(`/product/public/${id}`);
-
-    dispatch(getProductSuccess(response.data));
+    if (response) {
+      dispatch(getProductSuccess(response.data));
+    }
   } catch (error) {
     dispatch(hasError(error));
     toast.error(error.message);
