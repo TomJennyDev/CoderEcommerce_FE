@@ -30,8 +30,8 @@ export default function ProductList() {
         >{`No results found`}</Alert>
       )}
 
-      {products.map((product) => (
-        <Grid key={product._id} item xs={12} sm={6} md={4}>
+      {products.map((product, idx) => (
+        <Grid key={product._id || idx} item xs={12} sm={6} md={4}>
           {isLoading ? (
             <ProductCardSkeleton />
           ) : (

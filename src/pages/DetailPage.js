@@ -144,12 +144,12 @@ function DetailPage() {
                             width="80px"
                             height="80px"
                           >
-                            {!isLoading && (
+                            {!isLoading ? (
                               <ProductImgChildStyle
                                 alt={product?.title}
                                 src={img}
                               />
-                            )}
+                            ) : null}
                           </SkeletonLoading>
                         </ContainerChildImage>
                       );
@@ -260,7 +260,6 @@ function DetailPage() {
                             );
                           }
                         }}
-                        loading={!!isLoadingCart}
                         disabled={product?.inventoryStatus !== "available"}
                         startIcon={<ShoppingCartIcon />}
                       >
