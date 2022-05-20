@@ -3,7 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import BlankLayout from "../layouts/BlankLayout";
 import DashboardLayout from "../layouts/DashboardLayout";
 import MainLayout from "../layouts/MainLayout";
-import CheckoutPage from "../pages/CheckoutPage";
+import CartPage from "../pages/CartPage";
 import DashboardPage from "../pages/Dashboard/DashboardPage";
 import EditProductPage from "../pages/Dashboard/EditProductPage";
 import ProductPage from "../pages/Dashboard/ProductPage";
@@ -35,7 +35,7 @@ function Router() {
           path="checkout"
           element={
             <AuthRequire>
-              <CheckoutPage />
+              <CartPage />
             </AuthRequire>
           }
         />

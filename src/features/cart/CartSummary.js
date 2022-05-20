@@ -16,20 +16,21 @@ import {
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { createOrder } from "../features/order/orderSlice";
-import useAuth from "../hooks/useAuth";
-import { TitleStyle } from "../theme/customizations/TitleStyle";
-import { addDays, fDate } from "../utils/formatTime";
-import { fCurrency } from "../utils/numberFormat";
-import CheckOutSumTable from "./CheckoutSumTable";
+import useAuth from "../../hooks/useAuth";
+import { TitleStyle } from "../../theme/customizations/TitleStyle";
+import { addDays, fDate } from "../../utils/formatTime";
+import { fCurrency } from "../../utils/numberFormat";
+import { createOrder } from "../order/orderSlice";
+import { labelMethodPayment } from "./CartPayment";
+import CheckOutSumTable from "./CartSumTable";
 
-function CheckoutSummary() {
+function CartSummary() {
   const dispatch = useDispatch();
-  const { products, cart } = useSelector((state) => state.cart);
+  const { products, cart, isLoading } = useSelector((state) => state.cart);
   const { shipping, payment } = cart;
   const navigate = useNavigate();
   const { user } = useAuth();
-
+  console.log(payment);
   const handleCheckout = () => {
     const order = {
       cartId: cart._id,
@@ -89,7 +90,7 @@ function CheckoutSummary() {
                   `${shipping?.address1}  
                   ${shipping?.ward} ward, 
                   ${shipping?.district} district, 
-                  ${shipping?.city} city.`}{" "}
+                  ${shipping?.city} city.`}
               </Typography>
             </Stack>
           </Grid>
@@ -125,7 +126,7 @@ function CheckoutSummary() {
                   Payment method:
                 </Typography>
                 <Typography variant="subtitle2" textAlign="center">
-                  Credit Card
+                  {payment?.method && labelMethodPayment[payment?.method]}
                 </Typography>
               </Stack>
               <Stack direction="row" justifyContent="space-Between" spacing={2}>
@@ -194,4 +195,4 @@ function CheckoutSummary() {
   );
 }
 
-export default CheckoutSummary;
+export default CartSummary;

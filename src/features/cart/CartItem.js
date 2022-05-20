@@ -1,8 +1,8 @@
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
 import DeleteIcon from "@mui/icons-material/Delete";
-import FilterListIcon from "@mui/icons-material/FilterList";
 import LocalMallIcon from "@mui/icons-material/LocalMall";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import { Button, Stack } from "@mui/material";
 import Box from "@mui/material/Box";
 import Checkbox from "@mui/material/Checkbox";
@@ -23,16 +23,17 @@ import Typography from "@mui/material/Typography";
 import { styled } from "@mui/system";
 import { visuallyHidden } from "@mui/utils";
 import * as React from "react";
-import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { TitleStyle } from "../../theme/customizations/TitleStyle";
 import { fCurrency, fNumber } from "../../utils/numberFormat";
+import CartSideBar from "./CartSideBar";
 import {
   removeProductCart,
   updateCart,
   updateQuantityProductCart,
 } from "./cartSlice";
+
 const ButtonStyled = styled(Button)(({ theme }) => ({
   borderRadius: "50%",
   border: "1px solid",
@@ -162,7 +163,13 @@ function EnhancedTableHead(props) {
 const EnhancedTableToolbar = (props) => {
   const dispatch = useDispatch();
   const { isLoading } = useSelector((state) => state.cart);
-  const { numSelected, selected, setSelected } = props;
+  const {
+    numSelected,
+    selected,
+    setSelected,
+    handleUpdateCart,
+    setActiveStep,
+  } = props;
 
   return (
     <Toolbar
@@ -215,25 +222,29 @@ const EnhancedTableToolbar = (props) => {
           </IconButton>
         </Tooltip>
       ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
+        <Button
+          variant="contained"
+          onClick={() => {
+            handleUpdateCart();
+            setActiveStep((step) => step + 1);
+          }}
+          startIcon={<LocalShippingIcon />}
+        >
+          Delivery
+        </Button>
       )}
     </Toolbar>
   );
 };
 
-export default function CartDetail() {
-  const { products, isLoading, cart } = useSelector((state) => state.cart);
+export default function CartDetail({ setActiveStep }) {
+  const { products, cart } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
 
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("price");
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
   const handleRequestSort = (event, property) => {
@@ -290,9 +301,9 @@ export default function CartDetail() {
   const calSubTotal = products.reduce(
     (acc, curr, index, arr) => {
       acc.subTotal = acc.subTotal + curr.productId.priceSale * curr.quantity;
-      acc.shipping = acc.shipping + curr.productId.shipping * curr.quantity;
+      acc.shipping = acc.shipping + curr.productId.shipping;
       if (index === arr.length - 1) {
-        acc.subTotal = acc.subTotal / arr.length;
+        acc.subTotal = acc.subTotal;
         acc.shipping = acc.shipping / arr.length;
         acc.total = acc.subTotal + (acc.subTotal * 10) / 100 + acc.shipping;
       }
@@ -301,28 +312,30 @@ export default function CartDetail() {
     { subTotal: 0, shipping: 0, total: 0 }
   );
 
-  useEffect(() => {
+  const handleUpdateCart = () => {
     const cartUpdate = {
       ...cart,
       payment: { ...cart.payment, total: { ...calSubTotal, tax: 10 } },
     };
     dispatch(updateCart(cartUpdate));
+  };
+
+  React.useLayoutEffect(() => {
+    handleUpdateCart();
   }, [dispatch]);
 
   return (
-    <Box sx={{ width: "100%" }}>
+    <Stack sx={{ width: "100%" }} spacing={1}>
       <Paper sx={{ width: "100%", mb: 2 }}>
         <EnhancedTableToolbar
           numSelected={selected.length}
           selected={selected}
           setSelected={setSelected}
+          handleUpdateCart={handleUpdateCart}
+          setActiveStep={setActiveStep}
         />
         <TableContainer>
-          <Table
-            sx={{ minWidth: 750 }}
-            aria-labelledby="tableTitle"
-            size={dense ? "small" : "medium"}
-          >
+          <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle">
             <EnhancedTableHead
               numSelected={selected.length}
               order={order}
@@ -332,8 +345,6 @@ export default function CartDetail() {
               rowCount={products?.length}
             />
             <TableBody>
-              {/* if you don't need to support IE11, you can replace the `stableSort` call with:
-                 products.slice().sort(getComparator(order, orderBy)) */}
               {products &&
                 stableSort(products, getComparator(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
@@ -449,7 +460,7 @@ export default function CartDetail() {
               {emptyRows > 0 && (
                 <TableRow
                   style={{
-                    height: (dense ? 33 : 53) * emptyRows,
+                    height: 53 * emptyRows,
                   }}
                 >
                   <TableCell colSpan={6} />
@@ -468,6 +479,12 @@ export default function CartDetail() {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
-    </Box>
+
+      <Stack alignItems="flex-end">
+        <Box sx={{ width: "350px" }}>
+          <CartSideBar calSubTotal={calSubTotal} />
+        </Box>
+      </Stack>
+    </Stack>
   );
 }

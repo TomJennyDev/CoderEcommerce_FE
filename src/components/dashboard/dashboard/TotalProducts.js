@@ -1,5 +1,5 @@
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import CategoryIcon from "@mui/icons-material/Category";
 import {
   Avatar,
   Box,
@@ -14,7 +14,7 @@ export default function TotalProducts({ totalProducts }) {
   const date = new Date();
   const curentMonth = date.getMonth() + 1;
   let productCurrent = [];
-  if (totalProducts?.length == 1) {
+  if (totalProducts?.length === 1) {
     productCurrent = totalProducts;
   } else {
     productCurrent = totalProducts?.reduce((acc, curr, idx, arr) => {
@@ -44,7 +44,7 @@ export default function TotalProducts({ totalProducts }) {
                 width: 56,
               }}
             >
-              <AttachMoneyIcon />
+              <CategoryIcon />
             </Avatar>
           </Grid>
         </Grid>

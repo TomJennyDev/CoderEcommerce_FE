@@ -90,7 +90,7 @@ function ProductSidebar({ onCloseFilter, isOpenFilter }) {
     });
 
     return () => subscription.unsubscribe();
-  }, [watch]);
+  }, [watch, dispatch]);
 
   return (
     <Paper>

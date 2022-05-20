@@ -1,0 +1,83 @@
+import { Divider, Paper, Stack, Typography } from "@mui/material";
+import { Box } from "@mui/system";
+import { useSelector } from "react-redux";
+import SkeletonLoading from "../../components/SkeletonLoading";
+import { fCurrency } from "../../utils/numberFormat";
+
+function CartSideBar() {
+  const { cart, isLoading, products } = useSelector((state) => state.cart);
+
+  const calSubTotal = products.reduce(
+    (acc, curr, index, arr) => {
+      acc.subTotal = acc.subTotal + curr.productId.priceSale * curr.quantity;
+      acc.shipping = acc.shipping + curr.productId.shipping;
+      if (index === arr.length - 1) {
+        acc.subTotal = acc.subTotal;
+        acc.shipping = acc.shipping / arr.length;
+        acc.total = acc.subTotal + (acc.subTotal * 10) / 100 + acc.shipping;
+      }
+      return acc;
+    },
+    { subTotal: 0, shipping: 0, total: 0 }
+  );
+
+  return (
+    <Box component={Paper} spacing={3} sx={{ width: 1, p: 2 }}>
+      {isLoading ? (
+        <SkeletonLoading
+          count={4}
+          isLoading={isLoading}
+          height="25px"
+          width="100%"
+        />
+      ) : (
+        <>
+          <Stack direction="row" justifyContent="space-Between" spacing={2}>
+            <Typography variant="subtitle1" textAlign="center">
+              SubTotal:
+            </Typography>
+            <Typography variant="subtitle2" textAlign="center">
+              {!isLoading && fCurrency(calSubTotal?.subTotal)}
+            </Typography>
+          </Stack>
+          <Stack direction="row" justifyContent="space-Between" spacing={2}>
+            <Typography variant="subtitle1" textAlign="center">
+              Shipping:
+            </Typography>
+            <Typography variant="subtitle2" textAlign="center">
+              {!isLoading && fCurrency(calSubTotal?.shipping)}
+            </Typography>
+          </Stack>
+          <Stack direction="row" justifyContent="space-Between" spacing={2}>
+            <Typography variant="subtitle1" textAlign="center">
+              Tax (VAT):
+            </Typography>
+            <Typography variant="subtitle2" textAlign="center">
+              10%
+            </Typography>
+          </Stack>
+          <Stack direction="row" justifyContent="space-Between" spacing={2}>
+            <Typography variant="subtitle1" textAlign="center">
+              Discount:
+            </Typography>
+            <Typography variant="subtitle2" textAlign="center">
+              __
+            </Typography>
+          </Stack>
+        </>
+      )}
+      <Divider sx={{ m: 1 }} />
+      {isLoading ? (
+        <SkeletonLoading isLoading={isLoading} height="30px" width="100%" />
+      ) : (
+        <Stack direction="row" justifyContent="flex-end" spacing={2}>
+          <Typography variant="h6" textAlign="center">
+            {!isLoading && fCurrency(calSubTotal?.total)}
+          </Typography>
+        </Stack>
+      )}
+    </Box>
+  );
+}
+
+export default CartSideBar;

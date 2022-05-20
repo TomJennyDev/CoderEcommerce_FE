@@ -19,7 +19,7 @@ import React, { useLayoutEffect, useState } from "react";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { Link as RouterLink, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { default as SkeletonLoading } from "../components/Skeleton";
+import { default as SkeletonLoading } from "../components/SkeletonLoading";
 import { updateQuantityProductCart } from "../features/cart/cartSlice";
 import ProductSimilar from "../features/product/ProductSimilar";
 import { getProduct } from "../features/product/productSlice";
@@ -84,12 +84,10 @@ function DetailPage() {
     (state) => state.product,
     shallowEqual
   );
-  const { isLoading: isLoadingCart } = useSelector((state) => state.cart);
 
   useLayoutEffect(() => {
     dispatch(getProduct(id));
-    console.log("1");
-  }, []);
+  }, [id, dispatch]);
 
   return (
     <Container sx={{ my: 3 }}>

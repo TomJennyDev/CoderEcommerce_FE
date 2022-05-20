@@ -15,11 +15,12 @@ import { useDispatch } from "react-redux";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Label from "../../components/Label";
-import SkeletonLoading from "../../components/Skeleton";
+import SkeletonLoading from "../../components/SkeletonLoading";
 import useAuth from "../../hooks/useAuth";
 import { fCurrency } from "../../utils/numberFormat";
 import { updateQuantityProductCart } from "../cart/cartSlice";
 import { sendReviewReaction } from "./productSlice";
+
 const ProductImgStyle = styled("img")(({ theme }) => ({
   width: "50%",
   height: "auto",
@@ -33,10 +34,6 @@ const ProductImgStyle = styled("img")(({ theme }) => ({
   "&:hover": {
     transform: "translate(-50%,-50%) scale(1.05)",
   },
-}));
-
-const CardStyed = styled(Card)(({ theme }) => ({
-  "&:hover": { boxShadow: 1 },
 }));
 
 export default function ProductCard({ product, isLoading }) {
@@ -62,13 +59,13 @@ export default function ProductCard({ product, isLoading }) {
   }
   return (
     <Card>
-      <SkeletonLoading
-        isLoading={isLoading}
-        style={{ width: "100%", minHeight: "270px" }}
+      <Box
+        sx={{ pt: "100%", position: "relative", cursor: "pointer" }}
+        onClick={() => navigate(`/detail/${_id}`)}
       >
-        <Box
-          sx={{ pt: "100%", position: "relative", cursor: "pointer" }}
-          onClick={() => navigate(`/detail/${_id}`)}
+        <SkeletonLoading
+          isLoading={isLoading}
+          style={{ width: "100%", minHeight: "270px" }}
         >
           {status && (
             <Label
@@ -114,8 +111,8 @@ export default function ProductCard({ product, isLoading }) {
           )}
 
           <ProductImgStyle alt={title} src={imageUrls[0]} />
-        </Box>
-      </SkeletonLoading>
+        </SkeletonLoading>
+      </Box>
 
       <Stack spacing={1} sx={{ p: 2 }}>
         {isLoading && (

@@ -12,13 +12,13 @@ import {
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link as RouterLink } from "react-router-dom";
-import CheckoutDelivery from "../components/CheckoutDelivery";
-import CheckoutPayment from "../components/CheckoutPayment";
-import CheckoutSummary from "../components/CheckoutSummary";
-import CartDetail from "../features/cart/CartDetail";
+import CartDelivery from "../features/cart/CartDelivery";
+import CartDetail from "../features/cart/CartItem";
+import CartPayment from "../features/cart/CartPayment";
 import { getCart } from "../features/cart/cartSlice";
+import CartSummary from "../features/cart/CartSummary";
 
-function CheckoutPage() {
+function CartPage() {
   const dispatch = useDispatch();
   const { cart, products } = useSelector((state) => state.cart);
   const [activeStep, setActiveStep] = useState(0);
@@ -38,17 +38,17 @@ function CheckoutPage() {
     {
       value: "Delivery",
       Delivery: 1,
-      component: <CheckoutDelivery setActiveStep={setActiveStep} />,
+      component: <CartDelivery setActiveStep={setActiveStep} />,
     },
     {
       value: "Payment",
       Payment: 2,
-      component: <CheckoutPayment setActiveStep={setActiveStep} />,
+      component: <CartPayment setActiveStep={setActiveStep} />,
     },
     {
       value: "Summary",
       Summary: 3,
-      component: <CheckoutSummary setActiveStep={setActiveStep} />,
+      component: <CartSummary setActiveStep={setActiveStep} />,
     },
   ];
 
@@ -62,7 +62,7 @@ function CheckoutPage() {
         <Link color="inherit" component={RouterLink} to="/">
           Coder eCommerce
         </Link>
-        <Typography color="text.primary">Checkout</Typography>
+        <Typography color="text.primary">Cart</Typography>
       </Breadcrumbs>
 
       <Stack spacing={3}>
@@ -89,4 +89,4 @@ function CheckoutPage() {
   );
 }
 
-export default CheckoutPage;
+export default CartPage;

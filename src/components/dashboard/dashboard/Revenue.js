@@ -1,6 +1,6 @@
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import MoneyIcon from "@mui/icons-material/Money";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import {
   Avatar,
   Box,
@@ -10,7 +10,6 @@ import {
   Typography,
 } from "@mui/material";
 import { fCurrency, fNumber } from "../../../utils/numberFormat";
-
 export function Revenue({ revenues }) {
   const date = new Date();
   const curentMonth = date.getMonth() + 1;
@@ -43,7 +42,7 @@ export function Revenue({ revenues }) {
                 width: 56,
               }}
             >
-              <MoneyIcon />
+              <AttachMoneyIcon />
             </Avatar>
           </Grid>
         </Grid>

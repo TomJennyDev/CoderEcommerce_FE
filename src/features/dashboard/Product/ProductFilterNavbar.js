@@ -11,6 +11,7 @@ import { handleChangeFilters } from "./productSlice";
 
 const defaultValues = {
   sortBy: "",
+  rating: 1,
 };
 
 function ProductFilterNavbar(props) {

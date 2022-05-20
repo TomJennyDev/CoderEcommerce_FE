@@ -1,7 +1,9 @@
 import SearchIcon from "@mui/icons-material/Search";
 import { IconButton, InputAdornment, TextField } from "@mui/material";
 import { styled } from "@mui/system";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const CustomSearchField = styled(TextField)(({ theme }) => ({
   "& .MuiOutlinedInput-root": {
@@ -17,11 +19,20 @@ const CustomSearchField = styled(TextField)(({ theme }) => ({
 }));
 
 export default function SearchHeader({ handleDispatch }) {
+  const { filters } = useSelector((state) => state.product);
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const onSubmit = (e) => {
     e.preventDefault();
+    navigate("/");
     handleDispatch(searchQuery);
   };
+
+  useEffect(() => {
+    if (filters.title) {
+      setSearchQuery("");
+    }
+  }, [filters.title]);
 
   return (
     <form onSubmit={onSubmit}>

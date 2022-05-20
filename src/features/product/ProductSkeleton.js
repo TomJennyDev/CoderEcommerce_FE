@@ -1,24 +1,5 @@
 import { Card, Stack } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import SkeletonLoading from "../../components/Skeleton";
-const ProductImgStyle = styled("img")(({ theme }) => ({
-  width: "50%",
-  height: "auto",
-  transform: "translate(-50%,-50%) scale(1)",
-  top: "50%",
-  left: "50%",
-  position: "absolute",
-  transition: theme.transitions.create(["transform", "hover"], {
-    duration: theme.transitions.duration.standard,
-  }),
-  "&:hover": {
-    transform: "translate(-50%,-50%) scale(1.05)",
-  },
-}));
-
-const CardStyed = styled(Card)(({ theme }) => ({
-  "&:hover": { boxShadow: 1 },
-}));
+import SkeletonLoading from "../../components/SkeletonLoading";
 
 export default function ProductCardSkeleton({ isLoading }) {
   return (

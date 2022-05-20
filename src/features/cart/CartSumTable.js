@@ -12,7 +12,7 @@ import Typography from "@mui/material/Typography";
 import * as React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { fCurrency, fNumber } from "../utils/numberFormat";
+import { fCurrency, fNumber } from "../../utils/numberFormat";
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -34,7 +34,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-export default function CheckOutSumTable() {
+export default function CartSumTable() {
   const { products, isLoading } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
 

@@ -1,4 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
+import ClearAllIcon from "@mui/icons-material/ClearAll";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import PaymentIcon from "@mui/icons-material/Payment";
 import {
@@ -7,20 +8,20 @@ import {
   Grid,
   Paper,
   Stack,
-  Typography,
+  Typography
 } from "@mui/material";
 import { Box } from "@mui/system";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import * as yup from "yup";
-import { FormProvider, FRadioGroup, FTextField } from "../components/form";
-import { updateCart } from "../features/cart/cartSlice";
-import { TitleStyle } from "../theme/customizations/TitleStyle";
-import CheckoutSumSideBar from "./CheckoutSumSideBar";
+import { FormProvider, FRadioGroup, FTextField } from "../../components/form";
+import { TitleStyle } from "../../theme/customizations/TitleStyle";
+import CartSideBar from "./CartSideBar";
+import { updateCart } from "./cartSlice";
 
 const DeliverySchema = yup.object().shape({
-  email: yup.string().required("email is required"),
+  email: yup.string().email().required("email is required"),
   phone: yup.number().required("phone is required"),
   city: yup.string().required("City is required"),
   district: yup.string().required("district is required"),
@@ -29,30 +30,29 @@ const DeliverySchema = yup.object().shape({
   address2: yup.string(),
 });
 
-let shippingMethodLabel = [
-  "Free (expect to recive in 5-7 days)",
-  "Express (expect to receive in 3-5 days)",
-  "Next Day",
-];
-let shippingMethod = [7, 5, 1];
+export const shippingMethodLabel = {
+  7: "Free (expect to recive in 5-7 days)",
+  5: "Express (expect to receive in 3-5 days)",
+  1: "Next Day",
+};
+const shippingMethod = [7, 5, 1];
 
-function CheckoutDelivery({ setActiveStep }) {
+const defaultData = {
+  email: "",
+  phone: "",
+  city: "",
+  district: "",
+  ward: "",
+  address1: "",
+  address2: "",
+  method: "1",
+};
+
+function CartDelivery({ setActiveStep }) {
   const dispatch = useDispatch();
   const { products, cart } = useSelector((state) => state.cart);
   const { shipping } = cart;
-
-  let defaultValues = {
-    email: "",
-    phone: "",
-    city: "",
-    district: "",
-    ward: "",
-    address1: "",
-    address2: "",
-    method: "1",
-  };
-
-  defaultValues = shipping || defaultValues;
+  let defaultValues = shipping || defaultData;
 
   let methods = useForm({
     defaultValues,
@@ -112,10 +112,26 @@ function CheckoutDelivery({ setActiveStep }) {
                   getOptionLabel={shippingMethodLabel}
                 />
               </Stack>
+              <Stack
+                direction="row"
+                justifyContent="flex-end"
+                spacing={3}
+                sx={{ p: 2 }}
+              >
+                <Button
+                  variant="outlined"
+                  onClick={() => {
+                    reset(defaultData);
+                  }}
+                  startIcon={<ClearAllIcon />}
+                >
+                  Clear
+                </Button>
+              </Stack>
             </Box>
           </Grid>
           <Grid item xs={12} md={4}>
-            <CheckoutSumSideBar calSubTotal={cart?.payment?.total} />
+            <CartSideBar calSubTotal={cart?.payment?.total} />
             <Stack sx={{ py: 3 }}>
               <Button
                 type="submit"
@@ -132,4 +148,4 @@ function CheckoutDelivery({ setActiveStep }) {
   );
 }
 
-export default CheckoutDelivery;
+export default CartDelivery;

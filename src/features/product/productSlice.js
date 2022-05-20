@@ -8,6 +8,7 @@ const initialState = {
   products: [],
   product: {},
   totalPage: 1,
+  currentPage: 1,
   filters: {
     sortBy: "",
   },
@@ -31,6 +32,7 @@ const slice = createSlice({
 
       state.products = action.payload.results;
       state.totalPage = action.payload.totalPages;
+      state.currentPage = action.payload.page;
     },
     getProductSuccess(state, action) {
       state.isLoading = false;

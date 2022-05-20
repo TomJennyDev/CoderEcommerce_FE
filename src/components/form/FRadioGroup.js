@@ -21,7 +21,11 @@ function FRadioGroup({ name, options, getOptionLabel, ...other }) {
                 key={option}
                 value={option || ""}
                 control={<Radio />}
-                label={getOptionLabel?.length ? getOptionLabel[index] : option}
+                label={
+                  Object.keys(getOptionLabel).length
+                    ? getOptionLabel[option]
+                    : option
+                }
               />
             ))}
           </RadioGroup>

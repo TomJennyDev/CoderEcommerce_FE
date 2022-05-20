@@ -1,8 +1,7 @@
 // material
 import { Container, Grid, Stack } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
 import { REACT_APP_LIMIT } from "../app/config";
 import PaginationBar from "../components/PaginationBar";
 import ProductFilterSidebar from "../features/product/ProductFilterSidebar";
@@ -17,12 +16,11 @@ import useResponsive from "../hooks/useResponsive";
 
 export default function SearchPage() {
   const upLg = useResponsive("up", "lg");
-  let { totalPage } = useSelector((state) => state.product);
-  const { id: categoryId } = useParams();
+  let { totalPage, currentPage } = useSelector((state) => state.product);
+
   const dispatch = useDispatch();
 
   const [openFilter, setOpenFilter] = useState(false);
-  const [page, setPage] = useState(1);
 
   const handleDispatch = (value) => {
     dispatch(handleChangeFilters(value));
@@ -34,10 +32,11 @@ export default function SearchPage() {
   const handleCloseFilter = () => {
     setOpenFilter(false);
   };
-  useEffect(() => {
+
+  const handleChangePage = (page) => {
     let pagination = { page, limit: Number(REACT_APP_LIMIT) };
     dispatch(getAllProducts(pagination));
-  }, [dispatch, page]);
+  };
 
   return (
     <Container sx={{ mt: 5 }}>
@@ -72,8 +71,8 @@ export default function SearchPage() {
             <Stack alignItems="flex-end">
               <PaginationBar
                 totalPage={+totalPage}
-                setPage={setPage}
-                page={+page}
+                setPage={handleChangePage}
+                page={+currentPage}
               />
             </Stack>
           </Stack>
