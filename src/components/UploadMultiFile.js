@@ -1,13 +1,9 @@
 import { Box } from "@mui/material";
-// @mui
 import { styled } from "@mui/material/styles";
 import { useDropzone } from "react-dropzone";
-//
 import BlockContent from "./BlockContent";
 import MultiFilePreview from "./MultiFilePreview";
 import RejectionFiles from "./RejectionFiles";
-
-// ----------------------------------------------------------------------
 
 const DropZoneStyle = styled("div")(({ theme }) => ({
   outline: "none",
@@ -17,8 +13,6 @@ const DropZoneStyle = styled("div")(({ theme }) => ({
   border: `1px dashed ${theme.palette.grey[500_32]}`,
   "&:hover": { opacity: 0.72, cursor: "pointer" },
 }));
-
-// ----------------------------------------------------------------------
 
 export default function UploadMultiFile({
   error,

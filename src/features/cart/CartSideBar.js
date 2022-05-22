@@ -1,10 +1,14 @@
 import { Divider, Paper, Stack, Typography } from "@mui/material";
 import { Box } from "@mui/system";
-import { useSelector } from "react-redux";
+import { useLayoutEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import SkeletonLoading from "../../components/SkeletonLoading";
 import { fCurrency } from "../../utils/numberFormat";
+import { updateCart } from "./cartSlice";
 
 function CartSideBar() {
+  const dispatch = useDispatch();
+
   const { cart, isLoading, products } = useSelector((state) => state.cart);
 
   const calSubTotal = products.reduce(
@@ -12,7 +16,6 @@ function CartSideBar() {
       acc.subTotal = acc.subTotal + curr.productId.priceSale * curr.quantity;
       acc.shipping = acc.shipping + curr.productId.shipping;
       if (index === arr.length - 1) {
-        acc.subTotal = acc.subTotal;
         acc.shipping = acc.shipping / arr.length;
         acc.total = acc.subTotal + (acc.subTotal * 10) / 100 + acc.shipping;
       }
@@ -20,6 +23,17 @@ function CartSideBar() {
     },
     { subTotal: 0, shipping: 0, total: 0 }
   );
+
+  useLayoutEffect(() => {
+    const handleUpdateCart = () => {
+      const cartUpdate = {
+        ...cart,
+        payment: { ...cart.payment, total: { ...calSubTotal, tax: 10 } },
+      };
+      dispatch(updateCart(cartUpdate));
+    };
+    handleUpdateCart();
+  }, [dispatch]);
 
   return (
     <Box component={Paper} spacing={3} sx={{ width: 1, p: 2 }}>

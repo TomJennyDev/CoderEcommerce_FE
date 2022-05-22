@@ -12,8 +12,6 @@ import { useState } from "react";
 // component
 import Iconify from "../../components/Iconify";
 
-// ----------------------------------------------------------------------
-
 const APPBAR_MOBILE = 64;
 const APPBAR_DESKTOP = 92;
 
@@ -36,8 +34,6 @@ const SearchbarStyle = styled("div")(({ theme }) => ({
     padding: theme.spacing(0, 5),
   },
 }));
-
-// ----------------------------------------------------------------------
 
 export default function Searchbar() {
   const [isOpen, setOpen] = useState(false);

@@ -10,21 +10,22 @@ import {
   List,
   ListItem,
   ListItemAvatar,
-  ListItemText
+  ListItemText,
 } from "@mui/material";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllProductsDashboard } from "../../../features/dashboard/dashboardSlice";
+import { Link } from "react-router-dom";
 import { fToNow } from "../../../utils/formatTime";
+import { getAllProductsDashboard } from "../dashboardSlice";
 
 export default function LatestProducts(props) {
   const dispatch = useDispatch();
   const { products } = useSelector((state) => state.dashboard);
 
   useEffect(() => {
-    const filter = { sortBy: "updatedAt.desc" };
+    const filter = { sortBy: "createdAt.desc" };
     dispatch(getAllProductsDashboard(filter));
-  }, []);
+  }, [dispatch]);
   return (
     <Card {...props}>
       <CardHeader
@@ -49,7 +50,12 @@ export default function LatestProducts(props) {
               primary={product.name}
               secondary={`Updated ${fToNow(product?.updatedAt)}`}
             />
-            <IconButton edge="end" size="small">
+            <IconButton
+              edge="end"
+              size="small"
+              component={Link}
+              to={`/detail/${product?._id}`}
+            >
               <MoreVertIcon />
             </IconButton>
           </ListItem>
@@ -65,6 +71,8 @@ export default function LatestProducts(props) {
       >
         <Button
           color="primary"
+          component={Link}
+          to={`/dashboard/products`}
           endIcon={<ArrowRightIcon />}
           size="small"
           variant="text"

@@ -121,20 +121,11 @@ function MainHeader({ onOpenSidebar }) {
       <Box>
         <MenuItem
           onClick={handleMenuClose}
-          to="/"
+          to="/profile"
           component={RouterLink}
           sx={{ mx: 1 }}
         >
           My Profile
-        </MenuItem>
-
-        <MenuItem
-          onClick={handleMenuClose}
-          to="/account"
-          component={RouterLink}
-          sx={{ mx: 1 }}
-        >
-          Account Settings
         </MenuItem>
       </Box>
 
@@ -211,7 +202,7 @@ function MainHeader({ onOpenSidebar }) {
                 </>
               )}
 
-              {isScroll && !isDashboard && (
+              {isScroll && !isDashboard && mdUp && (
                 <SearchHeader handleDispatch={handleDispatch} />
               )}
 

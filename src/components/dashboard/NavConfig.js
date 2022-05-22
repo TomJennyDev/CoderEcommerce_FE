@@ -21,6 +21,11 @@ const navConfig = [
     path: "/dashboard/products",
     icon: getIcon("eva:shopping-bag-fill"),
   },
+  {
+    title: "order",
+    path: "/dashboard/order",
+    icon: getIcon("icon-park-solid:transaction-order"),
+  },
 ];
 
 export default navConfig;

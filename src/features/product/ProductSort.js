@@ -3,7 +3,7 @@ import SortIcon from "@mui/icons-material/Sort";
 import { InputAdornment } from "@mui/material";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { FormProvider, FSelect } from "../../components/form";
 
 export const SORT_BY_OPTIONS = [
@@ -20,8 +20,6 @@ const defaultValues = {
 };
 export default function ProductSort({ handleDispatch }) {
   const { filters } = useSelector((state) => state.product);
-
-  const dispatch = useDispatch();
 
   const methods = useForm({ defaultValues, mode: "onChange" });
   const { handleSubmit, reset, watch } = methods;

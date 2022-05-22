@@ -13,7 +13,7 @@ export default function ProductList() {
 
   useEffect(() => {
     dispatch(getAllProducts());
-  }, [filters]);
+  }, [filters, dispatch]);
 
   return (
     <Grid container spacing={3}>

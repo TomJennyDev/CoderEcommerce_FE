@@ -97,7 +97,7 @@ function DetailPage() {
         </Link>
         <Typography color="text.primary">
           {product?.title?.length > 50
-            ? product?.title?.slice(0, 50)
+            ? product?.title?.slice(0, 50) + "..."
             : product?.title}
         </Typography>
       </Breadcrumbs>

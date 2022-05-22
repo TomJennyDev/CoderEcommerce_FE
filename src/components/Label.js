@@ -1,9 +1,5 @@
-import { Box } from "@mui/material";
 // @mui
 import { alpha, styled } from "@mui/material/styles";
-import PropTypes from "prop-types";
-
-// ----------------------------------------------------------------------
 
 const RootStyle = styled("span")(({ theme, ownerState }) => {
   const isLight = theme.palette.mode === "light";
@@ -29,7 +25,7 @@ const RootStyle = styled("span")(({ theme, ownerState }) => {
     height: 22,
     minWidth: 22,
     lineHeight: 0,
-    borderRadius: 6,
+    borderRadius: 8,
     cursor: "default",
     alignItems: "center",
     whiteSpace: "nowrap",
@@ -64,53 +60,15 @@ const RootStyle = styled("span")(({ theme, ownerState }) => {
   };
 });
 
-// ----------------------------------------------------------------------
-
-Label.propTypes = {
-  children: PropTypes.node,
-  startIcon: PropTypes.node,
-  endIcon: PropTypes.node,
-  color: PropTypes.oneOf([
-    "default",
-    "primary",
-    "secondary",
-    "info",
-    "success",
-    "warning",
-    "error",
-  ]),
-  variant: PropTypes.oneOf(["filled", "outlined", "ghost"]),
-  sx: PropTypes.object,
-};
-
 export default function Label({
-  children,
   color = "default",
   variant = "ghost",
-  startIcon,
-  endIcon,
-  sx,
+  children,
+  ...other
 }) {
-  const style = {
-    width: 16,
-    height: 16,
-    "& svg, img": { width: 1, height: 1, objectFit: "cover" },
-  };
-
   return (
-    <RootStyle
-      ownerState={{ color, variant }}
-      sx={{
-        ...(startIcon && { pl: 0.75 }),
-        ...(endIcon && { pr: 0.75 }),
-        ...sx,
-      }}
-    >
-      {startIcon && <Box sx={{ mr: 0.75, ...style }}>{startIcon}</Box>}
-
+    <RootStyle ownerState={{ color, variant }} {...other}>
       {children}
-
-      {endIcon && <Box sx={{ ml: 0.75, ...style }}>{endIcon}</Box>}
     </RootStyle>
   );
 }

@@ -75,7 +75,6 @@ function EditProductPage() {
     imageUrls: isAdd ? [] : product?.imageUrls,
     imageFile: [],
   };
-  console.log(defaultValues);
 
   const methods = useForm({
     defaultValues,
@@ -109,7 +108,7 @@ function EditProductPage() {
       values = concat(values, newImageUrl);
       setValue("imageFile", values);
     },
-    [setValue]
+    [setValue, getValues]
   );
 
   const handleRemoveAll = () => {
@@ -130,7 +129,6 @@ function EditProductPage() {
   };
 
   const onSubmit = (data) => {
-    console.log(data);
     if (id && !isClone) {
       dispatch(updateProductDashboard(id, data));
     } else {
@@ -147,7 +145,7 @@ function EditProductPage() {
 
   useEffect(() => {
     reset(defaultValues);
-  }, [product]);
+  }, [product, reset]);
 
   useEffect(() => {
     register("descriptions", { required: true });

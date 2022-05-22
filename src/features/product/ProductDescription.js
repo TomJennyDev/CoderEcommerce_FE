@@ -29,7 +29,6 @@ function ProductDescription() {
   }));
 
   useEffect(() => {
-    console.log(ref.current.clientHeight, ref.current.scrollHeight);
     if (ref.current.clientHeight < ref.current.scrollHeight) {
       setShowButton(true);
     } else {

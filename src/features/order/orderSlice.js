@@ -8,7 +8,11 @@ const initialState = {
   error: null,
   order: {},
   orders: [],
+  productOrder: [],
+  totalOrder: 0,
+  currentPage: 1,
   totalPage: 1,
+  filters: {},
 };
 
 const slice = createSlice({
@@ -31,11 +35,36 @@ const slice = createSlice({
       state.error = null;
       state.orders = action.payload.results;
       state.totalPage = action.payload.totalPages;
+      state.currentPage = action.payload.page;
+      state.totalOrder = action.payload.totalResults;
+    },
+    updateStatusOrderByIdSuccess(state, action) {
+      state.isLoading = false;
+      state.error = null;
     },
     updateOrderSuccess(state, action) {
       state.isLoading = false;
-
-      state.order = action.payload;
+      state.error = null;
+    },
+    handleChangeFilters(state, action) {
+      state.isLoading = false;
+      state.error = null;
+      state.filters = { ...state.filters, ...action.payload };
+    },
+    handleClearFilters(state) {
+      state.isLoading = false;
+      state.error = null;
+      state.filters = {};
+      state.productOrder = [];
+    },
+    getProductOrder(state, action) {
+      state.productOrder = state.orders.find(
+        (order) => order._id === action.payload
+      ).products;
+      state.productOrder = state.productOrder.map(({ productId, quantity }) => {
+        productId = productId[0];
+        return { productId, quantity };
+      });
     },
     getTotalProducts(state, action) {
       state.totalProduct = action.payload;
@@ -45,18 +74,39 @@ const slice = createSlice({
 
 export const {
   startLoading,
+  hasError,
   getOrdersSuccess,
   updateOrderSuccess,
   getTotalProducts,
   createOrderSuccess,
-  hasError,
+  handleClearFilters,
+  handleChangeFilters,
+  getProductOrder,
+  updateStatusOrderByIdSuccess,
 } = slice.actions;
 
-export const getOrderList = (filter) => async (dispatch) => {
+export const getOrderList = (filters) => async (dispatch, getState) => {
   dispatch(startLoading());
   try {
-    const response = await apiService.get("/order", { ...filter });
+    filters = { ...filters, ...getState().order.filters };
+    const response = await apiService.get("/order/me", { params: filters });
 
+    if (response) {
+      dispatch(getOrdersSuccess(response.data));
+    }
+  } catch (error) {
+    dispatch(hasError(error));
+    toast.error(error.message);
+  }
+};
+
+export const getOrdersDashboard = (filters) => async (dispatch, getState) => {
+  dispatch(startLoading());
+  try {
+    filters = { ...filters, ...getState().order.filters };
+    const response = await apiService.get("/order", {
+      params: filters,
+    });
     if (response) {
       dispatch(getOrdersSuccess(response.data));
     }
@@ -72,7 +122,7 @@ export const createOrder = (order) => async (dispatch) => {
     const response = await apiService.post("/order/me/create", { ...order });
     if (response) {
       dispatch(clearTotalProducts());
-      toast.success("Thank you for buying product at Coder eCommerce");
+      toast.success("Thank you for buy product at Coder eCommerce");
     }
   } catch (error) {
     dispatch(hasError(error));
@@ -80,60 +130,36 @@ export const createOrder = (order) => async (dispatch) => {
   }
 };
 
-export const updateOrder = (order) => async (dispatch) => {
+export const updateOrderDashboard = (order, filters) => async (dispatch) => {
   dispatch(startLoading());
   try {
-    const response = await apiService.put(`/order/me/update`, { ...order });
-    dispatch(updateOrderSuccess(response.data));
+    const response = await apiService.put(`/order/update`, { ...order });
+    if (response) {
+      dispatch(updateOrderSuccess(response.data));
+      dispatch(getOrdersDashboard(filters));
+      toast.success("update status Order Successfully");
+    }
   } catch (error) {
     dispatch(hasError(error));
     toast.error(error.message);
   }
 };
 
-export const updateQuantityProductOrder =
-  ({ orderId, action }) =>
+export const updateStatusOrderById =
+  ({ orderId, status }) =>
   async (dispatch) => {
     dispatch(startLoading());
 
     try {
-      const response = await apiService.put(`/orderitem/me/update`, {
-        orderId,
-        action,
+      const response = await apiService.put(`/order/me/update`, {
+        orderIds: [orderId],
+        status,
       });
 
       if (response) {
-        // dispatch(
-        //   updateProductToOrderSuccess({
-        //     orderId,
-        //     action,
-        //     totalProduct: response.data,
-        //   })
-        // );
-      }
-    } catch (error) {
-      dispatch(hasError(error));
-      toast.error(error.message);
-    }
-  };
-
-export const removeProductOrder =
-  ({ orderId }) =>
-  async (dispatch) => {
-    dispatch(startLoading());
-
-    // "orderId": ["627ca8b9d7401e3ce9387183"]
-    try {
-      const response = await apiService.delete(`/orderitem/me/delete`, {
-        data: { orderId },
-      });
-      if (response) {
-        // dispatch(
-        //   removeProductOrderSuccess({
-        //     orders: orderId,
-        //     totalProduct: response.data,
-        //   })
-        // );
+        dispatch(updateStatusOrderByIdSuccess());
+        dispatch(getOrderList());
+        toast.success("cancel Order Successfully");
       }
     } catch (error) {
       dispatch(hasError(error));

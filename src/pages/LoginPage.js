@@ -1,31 +1,16 @@
-import React, { useState } from "react";
-import useAuth from "../hooks/useAuth";
-
-import { Box, Card, Stack, Tab, Tabs } from "@mui/material";
-import { styled } from "@mui/material/styles";
 import AccountBoxIcon from "@mui/icons-material/AccountBox";
 import ContactMailIcon from "@mui/icons-material/ContactMail";
-import PersonAddRoundedIcon from "@mui/icons-material/PersonAddRounded";
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt";
-
+import { Box, Card, Stack, Tab, Tabs } from "@mui/material";
 import { capitalCase } from "change-case";
+import React, { useState } from "react";
+import Logo from "../components/Logo";
 import Login from "../features/user/Login";
 import Register from "../features/user/Register";
-
 import useResponsive from "../hooks/useResponsive";
-import Logo from "../components/Logo";
 import ResetPassword from "./../features/user/ResetPassword";
 
-const TabsWrapperStyle = styled("div")(({ theme }) => ({
-  display: "flex",
-  justifyContent: "center",
-  paddingBottom: theme.spacing(2),
-}));
-
 function LoginPage() {
-  const { user } = useAuth();
-
-  const smUp = useResponsive("up", "sm");
   const mdUp = useResponsive("up", "md");
 
   const [currentTab, setCurrentTab] = useState("login");
@@ -37,17 +22,17 @@ function LoginPage() {
   const PROFILE_TABS = [
     {
       value: "login",
-      icon: <AccountBoxIcon sx={{ fontSize: 24 }} />,
+      icon: <AccountBoxIcon sx={{ fontSize: 20 }} />,
       component: <Login setCurrentTab={setCurrentTab} />,
     },
     {
       value: "register",
-      icon: <PeopleAltIcon sx={{ fontSize: 24 }} />,
+      icon: <PeopleAltIcon sx={{ fontSize: 20 }} />,
       component: <Register setCurrentTab={setCurrentTab} />,
     },
     {
-      value: "recovery",
-      icon: <ContactMailIcon sx={{ fontSize: 24 }} />,
+      value: "reset password",
+      icon: <ContactMailIcon sx={{ fontSize: 20 }} />,
       component: <ResetPassword setCurrentTab={setCurrentTab} />,
     },
   ];

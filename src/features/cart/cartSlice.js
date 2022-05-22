@@ -45,6 +45,7 @@ const slice = createSlice({
     updateProductToCartSuccess(state, action) {
       state.isLoading = false;
       state.error = null;
+
       state.totalProduct = action.payload.totalProduct;
 
       state.products = state.products.map((cartProduct) => {

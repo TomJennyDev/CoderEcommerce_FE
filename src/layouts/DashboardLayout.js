@@ -31,11 +31,13 @@ const MainStyle = styled("div")(({ theme }) => ({
     paddingLeft: theme.spacing(2),
     paddingRight: theme.spacing(2),
   },
+  paddingLeft: theme.spacing(2),
+  paddingRight: theme.spacing(2),
 }));
 
 export default function DashboardLayout() {
   const [open, setOpen] = useState(false);
-
+  console.log(open);
   return (
     <RootStyle direction="row">
       <AlertMsg />
@@ -46,7 +48,6 @@ export default function DashboardLayout() {
       />
       <MainStyle>
         <Stack direction="column">
-          {/* <Box sx={}/> */}
           <MainHeader onOpenSidebar={() => setOpen(true)} />
           <Outlet />
           <MainFooter />

@@ -8,9 +8,10 @@ import {
   Grid,
   Paper,
   Stack,
-  Typography
+  Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
+import { addDays } from "date-fns";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,11 +22,11 @@ import CartSideBar from "./CartSideBar";
 import { updateCart } from "./cartSlice";
 
 const DeliverySchema = yup.object().shape({
-  email: yup.string().email().required("email is required"),
-  phone: yup.number().required("phone is required"),
+  email: yup.string().email().required("Email is required"),
+  phone: yup.number().required("Phone is required"),
   city: yup.string().required("City is required"),
-  district: yup.string().required("district is required"),
-  ward: yup.string().required("ward is required"),
+  district: yup.string().required("District is required"),
+  ward: yup.string().required("Ward is required"),
   address1: yup.string().required("Address is required"),
   address2: yup.string(),
 });
@@ -50,7 +51,7 @@ const defaultData = {
 
 function CartDelivery({ setActiveStep }) {
   const dispatch = useDispatch();
-  const { products, cart } = useSelector((state) => state.cart);
+  const { cart } = useSelector((state) => state.cart);
   const { shipping } = cart;
   let defaultValues = shipping || defaultData;
 
@@ -62,9 +63,11 @@ function CartDelivery({ setActiveStep }) {
   const { handleSubmit, reset } = methods;
 
   const onSubmit = (data) => {
+    const deliveryTime = addDays(new Date(), +data.method).toISOString();
+
     const cartUpdate = {
       ...cart,
-      shipping: data,
+      shipping: { ...data, deliveryTime },
       status: "Delivery",
     };
 

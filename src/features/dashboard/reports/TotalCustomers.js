@@ -1,6 +1,5 @@
-import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import ArrowUpwardIcon from "@mui/icons-material/ArrowUpward";
-import InsertChartIcon from "@mui/icons-material/InsertChartOutlined";
+import PeopleIcon from "@mui/icons-material/PeopleOutlined";
 import {
   Avatar,
   Box,
@@ -11,41 +10,42 @@ import {
 } from "@mui/material";
 import { fNumber } from "../../../utils/numberFormat";
 
-export default function TotalOrder({ totalOrders }) {
+export default function TotalCustomers({ totalCustomers }) {
   const date = new Date();
   const curentMonth = date.getMonth() + 1;
-
-  const orderCurrent = totalOrders?.reduce((acc, curr, idx, arr) => {
-    if (curr.month === curentMonth) acc.count = curr?.count;
-    if (curr.month === curentMonth - 1) acc.countLastMonth = curr?.count;
-    if (arr.length - 1 === idx) {
-      acc.percent = (acc.count * 100) / acc.countLastMonth;
-    }
-    return acc;
-  }, {});
-
-  console.log(totalOrders);
+  let customerCurrent = [];
+  if (totalCustomers?.length === 1) {
+    customerCurrent = totalCustomers;
+  } else {
+    customerCurrent = totalCustomers?.reduce((acc, curr, idx, arr) => {
+      if (curr.month === curentMonth) acc.count = curr?.count;
+      acc.percent = (arr[1].count * 100) / arr[0].count;
+      return acc;
+    }, {});
+  }
   return (
-    <Card sx={{ height: "100%" }}>
+    <Card>
       <CardContent>
         <Grid container spacing={3} sx={{ justifyContent: "space-between" }}>
           <Grid item>
             <Typography color="textSecondary" gutterBottom variant="overline">
-              TOTAL ODERS
+              TOTAL CUSTOMERS
             </Typography>
             <Typography color="textPrimary" variant="h4">
-              {orderCurrent?.count}
+              {customerCurrent?.length === 1
+                ? customerCurrent?.[0].count
+                : customerCurrent?.count}
             </Typography>
           </Grid>
           <Grid item>
             <Avatar
               sx={{
-                backgroundColor: "warning.main",
+                backgroundColor: "success.main",
                 height: 56,
                 width: 56,
               }}
             >
-              <InsertChartIcon />
+              <PeopleIcon />
             </Avatar>
           </Grid>
         </Grid>
@@ -56,24 +56,16 @@ export default function TotalOrder({ totalOrders }) {
             alignItems: "center",
           }}
         >
-          {orderCurrent?.countLastMonth > orderCurrent?.count ? (
-            <ArrowDownwardIcon color="error" />
-          ) : (
-            <ArrowUpwardIcon color="success" />
-          )}
+          <ArrowUpwardIcon color="success" />
 
           <Typography
-            color={
-              orderCurrent?.countLastMonth > orderCurrent?.count
-                ? "error"
-                : "success"
-            }
+            color="success"
             sx={{
               mr: 1,
             }}
             variant="body2"
           >
-            {fNumber(orderCurrent?.percent)} %
+            {fNumber(customerCurrent?.percent)} %
           </Typography>
           <Typography color="textSecondary" variant="caption">
             Since last month

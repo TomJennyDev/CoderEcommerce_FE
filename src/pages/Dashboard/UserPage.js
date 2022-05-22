@@ -1,7 +1,7 @@
 import GroupIcon from "@mui/icons-material/Group";
 import PersonIcon from "@mui/icons-material/Person";
 import PersonOffIcon from "@mui/icons-material/PersonOff";
-import { Avatar, AvatarGroup, Button, Chip, Stack } from "@mui/material";
+import { Avatar, AvatarGroup, Chip, Stack } from "@mui/material";
 import Box from "@mui/material/Box";
 import Checkbox from "@mui/material/Checkbox";
 import IconButton from "@mui/material/IconButton";
@@ -18,7 +18,6 @@ import TableSortLabel from "@mui/material/TableSortLabel";
 import Toolbar from "@mui/material/Toolbar";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
-import { styled } from "@mui/system";
 import { visuallyHidden } from "@mui/utils";
 import * as React from "react";
 import { useEffect } from "react";
@@ -33,15 +32,6 @@ import {
 } from "../../features/user/userSlice";
 import { TitleStyle } from "../../theme/customizations/TitleStyle";
 import { fDate } from "../../utils/formatTime";
-
-const ButtonStyled = styled(Button)(({ theme }) => ({
-  borderRadius: "50%",
-  border: "1px solid",
-  width: 30,
-  minWidth: 30,
-  height: 30,
-  zIndex: 999,
-}));
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -59,8 +49,6 @@ function getComparator(order, orderBy) {
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-// This method is created for cross-buserser compatibility, if you don't
-// need to support IE11, you can use Array.prototype.sort() directly
 function stableSort(array, comparator) {
   const stabilizedThis = array?.map((el, index) => [el, index]);
   stabilizedThis.sort((a, b) => {
@@ -159,7 +147,7 @@ function EnhancedTableHead(props) {
             >
               {headCell.label}
               {orderBy === headCell.id ? (
-                <Box component="span" sx={visuallyHidden}>
+                <Box sx={visuallyHidden}>
                   {order === "desc" ? "sorted descending" : "sorted ascending"}
                 </Box>
               ) : null}
@@ -173,7 +161,7 @@ function EnhancedTableHead(props) {
 
 const EnhancedTableToolbar = (props) => {
   const dispatch = useDispatch();
-  const { users, filters } = useSelector((state) => state.user);
+  const { users } = useSelector((state) => state.user);
   const { numSelected, selected, setSelected } = props;
   const user = users.find((user) => user._id === selected[0] && user.isDeleted);
   const handleSubmit = (searchQuery) =>
@@ -221,15 +209,17 @@ const EnhancedTableToolbar = (props) => {
         </Tooltip>
       ) : (
         <Tooltip title="Deative User">
-          <IconButton
-            disabled={numSelected === 0}
-            onClick={() => {
-              dispatch(deactiveUser(selected[0]));
-              setSelected([]);
-            }}
-          >
-            <PersonOffIcon />
-          </IconButton>
+          <span>
+            <IconButton
+              disabled={numSelected === 0}
+              onClick={() => {
+                dispatch(deactiveUser(selected[0]));
+                setSelected([]);
+              }}
+            >
+              <PersonOffIcon />
+            </IconButton>
+          </span>
         </Tooltip>
       )}
     </Toolbar>
@@ -237,16 +227,14 @@ const EnhancedTableToolbar = (props) => {
 };
 
 export default function UserPage() {
-  const { users, isLoading, totalUsers, filters } = useSelector(
-    (state) => state.user
-  );
+  const { users, totalUsers, filters } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("name");
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
+
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
   const handleRequestSort = (event, property) => {
@@ -304,7 +292,7 @@ export default function UserPage() {
   useEffect(() => {
     const filters = { page: page + 1, limit: rowsPerPage };
     dispatch(getUserList(filters));
-  }, [selected, filters]);
+  }, [selected, filters, dispatch, page, rowsPerPage]);
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -326,7 +314,7 @@ export default function UserPage() {
           <Table
             sx={{ minWidth: 750 }}
             aria-labelledby="tableTitle"
-            size={dense ? "small" : "medium"}
+            size={"medium"}
           >
             <EnhancedTableHead
               numSelected={selected.length}
@@ -447,7 +435,7 @@ export default function UserPage() {
               {emptyRows > 0 && (
                 <TableRow
                   style={{
-                    height: (dense ? 33 : 53) * emptyRows,
+                    height: 53 * emptyRows,
                   }}
                 >
                   <TableCell colSpan={6} />

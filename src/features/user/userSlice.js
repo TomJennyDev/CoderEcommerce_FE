@@ -79,6 +79,7 @@ export const {
   handleChangeUserFilters,
   handleClearUserFilters,
 } = slice.actions;
+
 export const updateUserProfile =
   ({
     userId,
@@ -104,12 +105,14 @@ export const updateUserProfile =
         role,
         creditCards,
       };
+      if (!password) delete data.password;
       if (avatarUrl instanceof File) {
         const imageUrl = await cloudinaryUpload(avatarUrl);
         data.avatarUrl = imageUrl;
       }
-      const response = await apiService.put(`/users/${userId}`, data);
+      const response = await apiService.put(`/users/me/update`, { ...data });
       dispatch(updateUserProfileSuccess(response.data));
+      dispatch(getCurrentUserProfile());
       toast.success("Update Profile successfully");
     } catch (error) {
       dispatch(hasError(error.message));
@@ -153,11 +156,11 @@ export const getUserList = (filters) => async (dispatch, getState) => {
 export const deactiveUser = (id) => async (dispatch) => {
   dispatch(startLoading());
   try {
-    console.log(id);
     const repsonse = await apiService.delete(`/users/delete/${id}`);
     dispatch(getUserList());
-
-    dispatch(deactiveUserSuccess());
+    if (repsonse) {
+      dispatch(deactiveUserSuccess());
+    }
     toast.success("You are deactive user sucessfully!");
   } catch (error) {
     dispatch(hasError(error));
@@ -171,10 +174,12 @@ export const updateUser = (id, updateContent) => async (dispatch) => {
     const repsonse = await apiService.put(`/users/update/${id}`, {
       ...updateContent,
     });
-    dispatch(getUserList());
+    if (repsonse) {
+      dispatch(getUserList());
 
-    dispatch(updateUserSuccess());
-    toast.success("You are updated user sucessfully!");
+      dispatch(updateUserSuccess());
+      toast.success("You are updated user sucessfully!");
+    }
   } catch (error) {
     dispatch(hasError(error));
     toast.error(error.message);

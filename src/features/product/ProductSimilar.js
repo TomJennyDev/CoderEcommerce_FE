@@ -2,7 +2,7 @@ import { Box, Divider, Typography } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { REACT_APP_LIMIT } from "../../app/config";
-import SwiperCustom from "../../components/Swipper/SwiperCustom";
+import SwiperCustom from "../../components/swipper/SwiperCustom";
 import { getAllProducts } from "./productSlice";
 
 function ProductSimilar({ categoryId }) {

@@ -28,11 +28,7 @@ import { Link } from "react-router-dom";
 import { TitleStyle } from "../../theme/customizations/TitleStyle";
 import { fCurrency, fNumber } from "../../utils/numberFormat";
 import CartSideBar from "./CartSideBar";
-import {
-  removeProductCart,
-  updateCart,
-  updateQuantityProductCart,
-} from "./cartSlice";
+import { removeProductCart, updateQuantityProductCart } from "./cartSlice";
 
 const ButtonStyled = styled(Button)(({ theme }) => ({
   borderRadius: "50%",
@@ -163,13 +159,7 @@ function EnhancedTableHead(props) {
 const EnhancedTableToolbar = (props) => {
   const dispatch = useDispatch();
   const { isLoading } = useSelector((state) => state.cart);
-  const {
-    numSelected,
-    selected,
-    setSelected,
-    handleUpdateCart,
-    setActiveStep,
-  } = props;
+  const { numSelected, selected, setSelected, setActiveStep } = props;
 
   return (
     <Toolbar
@@ -225,7 +215,6 @@ const EnhancedTableToolbar = (props) => {
         <Button
           variant="contained"
           onClick={() => {
-            handleUpdateCart();
             setActiveStep((step) => step + 1);
           }}
           startIcon={<LocalShippingIcon />}
@@ -238,7 +227,7 @@ const EnhancedTableToolbar = (props) => {
 };
 
 export default function CartDetail({ setActiveStep }) {
-  const { products, cart } = useSelector((state) => state.cart);
+  const { products } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
 
   const [order, setOrder] = React.useState("asc");
@@ -298,32 +287,6 @@ export default function CartDetail({ setActiveStep }) {
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - products.length) : 0;
 
-  const calSubTotal = products.reduce(
-    (acc, curr, index, arr) => {
-      acc.subTotal = acc.subTotal + curr.productId.priceSale * curr.quantity;
-      acc.shipping = acc.shipping + curr.productId.shipping;
-      if (index === arr.length - 1) {
-        acc.subTotal = acc.subTotal;
-        acc.shipping = acc.shipping / arr.length;
-        acc.total = acc.subTotal + (acc.subTotal * 10) / 100 + acc.shipping;
-      }
-      return acc;
-    },
-    { subTotal: 0, shipping: 0, total: 0 }
-  );
-
-  const handleUpdateCart = () => {
-    const cartUpdate = {
-      ...cart,
-      payment: { ...cart.payment, total: { ...calSubTotal, tax: 10 } },
-    };
-    dispatch(updateCart(cartUpdate));
-  };
-
-  React.useLayoutEffect(() => {
-    handleUpdateCart();
-  }, [dispatch]);
-
   return (
     <Stack sx={{ width: "100%" }} spacing={1}>
       <Paper sx={{ width: "100%", mb: 2 }}>
@@ -331,7 +294,6 @@ export default function CartDetail({ setActiveStep }) {
           numSelected={selected.length}
           selected={selected}
           setSelected={setSelected}
-          handleUpdateCart={handleUpdateCart}
           setActiveStep={setActiveStep}
         />
         <TableContainer>
@@ -388,6 +350,7 @@ export default function CartDetail({ setActiveStep }) {
                             <Box sx={{ maxWidth: "100px", height: "100%" }}>
                               <img
                                 src={row?.productId?.imageUrls?.[0]}
+                                alt={row?.productId?.title}
                                 style={{ width: "100%", height: "100%" }}
                               />
                             </Box>
@@ -482,7 +445,7 @@ export default function CartDetail({ setActiveStep }) {
 
       <Stack alignItems="flex-end">
         <Box sx={{ width: "350px" }}>
-          <CartSideBar calSubTotal={calSubTotal} />
+          <CartSideBar />
         </Box>
       </Stack>
     </Stack>

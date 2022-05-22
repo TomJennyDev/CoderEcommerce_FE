@@ -15,17 +15,49 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import * as yup from "yup";
-import { FormProvider, FRadioGroup, FTextField } from "../../components/form";
+import {
+  FormProvider,
+  FRadioGroup,
+  FSelect,
+  FTextField,
+} from "../../components/form";
 import { TitleStyle } from "../../theme/customizations/TitleStyle";
 import CartSideBar from "./CartSideBar";
 import { updateCart } from "./cartSlice";
 
 const PaymentSchema = yup.object().shape({
   method: yup.string(),
-  cardNumber: yup.number().required("cardNumber is required"),
-  expMonth: yup.string().required("expMonth is required"),
-  cardCVV: yup.string().required("cardCVV is required"),
-  cardIssuer: yup.string().required("cardIssuer is required"),
+  cardHolder: yup.string().max(255).required("card Holder is required"),
+  cardNumber: yup
+    .string()
+    .max(16, "Not a valid card Number")
+    // Visa, MasterCard, American Express, Diners Club, Discover, and JCB cards
+    .matches(
+      /^(?:4[0-9]{12}(?:[0-9]{3})?|[25][1-7][0-9]{14}|6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|(?:2131|1800|35\d{3})\d{11})$/,
+      "Not a valid card Number"
+    )
+    .required("Card Number is required"),
+  expDate: yup
+    .string()
+    .max(5, "Not a valid expiration date. Example: MM/YY")
+    .matches(
+      /^(0[1-9]|1[0-2])\/?([0-9]{4}|[0-9]{2})$/,
+      "Not a valid expiration date. Example: MM/YY"
+    )
+    .required("expiry Month and Year is required"),
+  cardCVV: yup
+    .string()
+    .max(4, "Not a valid card CVV")
+    .matches(
+      /^[0-9]{3,4}$/,
+      // ^: Start of string anchor
+      // [0-9]: Digit between 0 and 9 (you could also use \d here)
+      // {3,4}: A quantifier meaning between 3 and 4.
+      // $: End of string anchor
+      "Not a valid card CVV"
+    )
+    .required("card CVV is required"),
+  cardIssuer: yup.string().required("card Issuer is required"),
 });
 
 const PaymentCreaditSchema = yup.object().shape({
@@ -40,12 +72,22 @@ export const labelMethodPayment = {
   bankOnline: "Bank Online",
 };
 
+export const listCartIssuer = [
+  "Visa",
+  "MasterCard",
+  "American Express",
+  "Diners Club",
+  "Discover",
+  "JCB",
+];
+
 const defaultData = {
   method: "credit",
+  cardHolder: "",
   cardNumber: 0,
-  expMonth: "",
+  expDate: "",
   cardCVV: "",
-  cardIssuer: "",
+  cardIssuer: "American Express",
 };
 function CartPayment({ setActiveStep }) {
   const dispatch = useDispatch();
@@ -111,12 +153,26 @@ function CartPayment({ setActiveStep }) {
                 {methodValues === "credit" && (
                   <>
                     <Stack direction="row" spacing={3}>
+                      <FTextField name="cardHolder" label="Card Holder" />
+                    </Stack>
+                    <Stack direction="row" spacing={3}>
                       <FTextField name="cardNumber" label="Card Number" />
-                      <FTextField name="expMonth" label="Exp. Month" />
+                      <FTextField name="expDate" label="Exp (MM/YY)" />
                     </Stack>
                     <Stack direction="row" spacing={3}>
                       <FTextField name="cardCVV" label="CVV" />
-                      <FTextField name="cardIssuer" label="Card Issuer" />
+
+                      <FSelect
+                        name="cardIssuer"
+                        label="Card Issuer"
+                        variant="standard"
+                      >
+                        {listCartIssuer.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </FSelect>
                     </Stack>
                     <Stack
                       direction="row"

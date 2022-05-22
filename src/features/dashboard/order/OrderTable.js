@@ -1,8 +1,8 @@
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
-import DifferenceIcon from "@mui/icons-material/Difference";
+import ClearAllIcon from "@mui/icons-material/ClearAll";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import { Chip, Rating, Stack } from "@mui/material";
+import InfoIcon from "@mui/icons-material/Info";
+import SettingsIcon from "@mui/icons-material/Settings";
+import { InputAdornment, Stack } from "@mui/material";
 import Box from "@mui/material/Box";
 import Checkbox from "@mui/material/Checkbox";
 import IconButton from "@mui/material/IconButton";
@@ -24,83 +24,65 @@ import * as React from "react";
 import { useEffect } from "react";
 import "react-perfect-scrollbar/dist/css/styles.css";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, NavLink } from "react-router-dom";
-import SearchInput from "../../../components/SearchInput";
+import { FSelect } from "../../../components/form";
+import FMultiDatePicker from "../../../components/form/FMultiDatePicker";
+import { SeverityPill } from "../../../components/severity-pill";
 import TablePaginationActions from "../../../components/TablePaginationActions";
-import { fCurrency, fNumber } from "../../../utils/numberFormat";
-import ProductSort from "../../product/ProductSort";
+import { addDays, fDate } from "../../../utils/formatTime";
+import { fCurrency } from "../../../utils/numberFormat";
+import { labelMethodPayment } from "../../cart/CartPayment";
+import CartSumTable from "../../cart/CartSumTable";
 import {
-  getAllProductsDashboard,
-  handleChangeDashBoardFilters,
-} from "../dashboardSlice";
+  getOrdersDashboard,
+  getProductOrder,
+  handleChangeFilters,
+  handleClearFilters,
+} from "../../order/orderSlice";
 
-function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
-
-function getComparator(order, orderBy) {
-  return order === "desc"
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-// This method is created for cross-browser compatibility, if you don't
-// need to support IE11, you can use Array.prototype.sort() directly
-function stableSort(array, comparator) {
-  const stabilizedThis = array?.map((el, index) => [el, index]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) {
-      return order;
-    }
-    return a[1] - b[1];
-  });
-
-  return stabilizedThis.map((el) => el[0]);
-}
+export const STATUS_ORDER = ["pending", "delivered", "refunded", "cancel"];
 
 const headCells = [
   {
     id: "_id",
     aligns: "left",
     disablePadding: true,
-    label: "Product",
-  },
-  {
-    id: "category",
-    aligns: "left",
-    disablePadding: false,
-    label: "Category",
-  },
-  {
-    id: "rating",
-    aligns: "center",
-    disablePadding: false,
-    label: "Rating",
-  },
-  {
-    id: "price",
-    aligns: "right",
-    disablePadding: false,
-    label: "Price",
-  },
-  {
-    id: "quantity",
-    aligns: "right",
-    disablePadding: false,
-    label: "Quantity",
+    label: "Order Number",
   },
   {
     id: "status",
     aligns: "right",
     disablePadding: false,
     label: "Status",
+  },
+  {
+    id: "customer",
+    aligns: "right",
+    disablePadding: false,
+    label: "Customer",
+  },
+  {
+    id: "createdAt",
+    aligns: "right",
+    disablePadding: false,
+    label: "Place on",
+  },
+  {
+    id: "DeliveredAt",
+    aligns: "right",
+    disablePadding: false,
+    label: "Delivery on",
+  },
+  {
+    id: "payment",
+    aligns: "right",
+    disablePadding: false,
+    label: "Payment Method",
+  },
+  {
+    id: "total",
+    aligns: "right",
+    disablePadding: false,
+    label: "Total",
   },
 ];
 
@@ -159,16 +141,38 @@ function EnhancedTableHead(props) {
 
 const EnhancedTableToolbar = (props) => {
   const dispatch = useDispatch();
-  const { numSelected, selected, setSelected } = props;
-  const handleSubmit = (searchQuery) =>
-    dispatch(handleChangeDashBoardFilters({ title: searchQuery }));
-  const handleDispatch = (value) =>
-    dispatch(handleChangeDashBoardFilters(value));
+  const { numSelected, selected, setPage, reset, watch } = props;
+  const { orders, filters } = useSelector((state) => state.order);
+
+  const isPending = orders.find(
+    (order) => order._id === selected[0] && order.status === "pending"
+  );
+
+  useEffect(() => {
+    const subscription = watch((value) => {
+      let { delivery, ...restValue } = value;
+
+      let filters = {};
+      const deliveryStart = delivery[0] && delivery[0].toISOString();
+      const deliveryEnd = delivery[1] && delivery[1].toISOString();
+      filters = { ...restValue, deliveryEnd, deliveryStart };
+
+      dispatch(handleChangeFilters(filters));
+    });
+
+    return () => {
+      reset();
+      dispatch(handleClearFilters());
+      subscription.unsubscribe();
+    };
+  }, [watch, dispatch]);
+
   return (
     <Toolbar
       sx={{
         pl: { sm: 2 },
         pr: { xs: 1, sm: 1 },
+        width: "100%",
         ...(numSelected > 0 && {
           bgcolor: (theme) =>
             alpha(
@@ -178,81 +182,121 @@ const EnhancedTableToolbar = (props) => {
         }),
       }}
     >
-      {numSelected > 0 ? (
-        <Typography
-          sx={{ flex: "1 1 100%" }}
-          color="inherit"
-          variant="subtitle1"
-          component="div"
-        >
-          {numSelected} selected
-        </Typography>
-      ) : (
-        <Stack
-          direction="row"
-          alignItems="center"
-          sx={{ flex: "1 1 100%" }}
-          spacing={2}
-        >
-          <SearchInput handleSubmit={handleSubmit} />
-          <ProductSort handleDispatch={handleDispatch} />
-        </Stack>
-      )}
-      {numSelected > 0 ? (
-        <Tooltip title="Clone Product">
-          <IconButton
-            component={NavLink}
-            to={`/dashboard/products/clone/${selected[0]}`}
-            onClick={() => setSelected([])}
+      <Stack
+        sx={{ width: "100%" }}
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+      >
+        {numSelected > 0 ? (
+          <Typography
+            sx={{ flex: "1 1 100%" }}
+            color="inherit"
+            variant="subtitle1"
+            component="div"
           >
-            <DifferenceIcon />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Add Product">
-          <IconButton
-            component={NavLink}
-            to={`/dashboard/products/add`}
-            onClick={() => setSelected([])}
+            {numSelected} selected
+          </Typography>
+        ) : (
+          <Stack
+            direction="row"
+            alignItems="center"
+            sx={{ flex: "1 1 100%" }}
+            spacing={2}
           >
-            <AddCircleIcon />
-          </IconButton>
-        </Tooltip>
-      )}
-
-      {numSelected > 0 ? (
-        <Tooltip title="Edit Product">
+            <FSelect
+              name="status"
+              label="status"
+              size="small"
+              sx={{ width: "200px" }}
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <FilterListIcon />
+                  </InputAdornment>
+                ),
+              }}
+            >
+              {STATUS_ORDER.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </FSelect>
+            <FMultiDatePicker
+              size="small"
+              name="delivery"
+              startText="Delivery-on-start"
+              endText="Delivery-on-end"
+            />
+          </Stack>
+        )}
+        <Tooltip title="Watch Product">
           <IconButton
-            component={NavLink}
-            to={`/dashboard/products/edit/${selected[0]}`}
-            onClick={() => setSelected([])}
+            onClick={() => {
+              if (numSelected > 0) dispatch(getProductOrder(selected[0]));
+            }}
           >
-            <AutoFixHighIcon />
+            <InfoIcon />
           </IconButton>
         </Tooltip>
-      ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
-      )}
+        {numSelected > 0 ? (
+          <FSelect
+            name="statusUpdate"
+            label="status"
+            size="small"
+            sx={{ width: "200px" }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SettingsIcon />
+                </InputAdornment>
+              ),
+            }}
+          >
+            {STATUS_ORDER.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </FSelect>
+        ) : (
+          <>
+            <Tooltip title="Clear filter">
+              <IconButton
+                onClick={() => {
+                  setPage(0);
+                  reset();
+                  dispatch(handleClearFilters());
+                }}
+              >
+                <ClearAllIcon />
+              </IconButton>
+            </Tooltip>
+          </>
+        )}
+      </Stack>
     </Toolbar>
   );
 };
 
-export default function ProductTable() {
-  const { products, totalProduct, filters } = useSelector(
-    (state) => state.dashboard
+export default function OrderTable({
+  reset,
+  watch,
+  selected,
+  setSelected,
+  page,
+  setPage,
+  rowsPerPage,
+  setRowsPerPage,
+}) {
+  const { orders, totalOrder, filters, productOrder } = useSelector(
+    (state) => state.order
   );
   const dispatch = useDispatch();
 
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("price");
-  const [selected, setSelected] = React.useState([]);
-  const [page, setPage] = React.useState(0);
-
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
@@ -262,7 +306,7 @@ export default function ProductTable() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = products.map((n) => n._id);
+      const newSelecteds = orders.map((n) => n._id);
       setSelected(newSelecteds);
 
       return;
@@ -286,7 +330,6 @@ export default function ProductTable() {
         selected.slice(selectedIndex + 1)
       );
     }
-
     setSelected(newSelected);
   };
 
@@ -303,12 +346,12 @@ export default function ProductTable() {
 
   // Avoid a layout jump when reaching the last page with empty products.
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - totalProduct) : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - totalOrder) : 0;
 
   useEffect(() => {
     const filters = { page: page + 1, limit: rowsPerPage };
-    dispatch(getAllProductsDashboard(filters));
-  }, [page, rowsPerPage, filters, dispatch]);
+    dispatch(getOrdersDashboard(filters));
+  }, [page, rowsPerPage, filters, productOrder]);
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -317,6 +360,9 @@ export default function ProductTable() {
           numSelected={selected.length}
           selected={selected}
           setSelected={setSelected}
+          reset={reset}
+          watch={watch}
+          setPage={setPage}
         />
         <TableContainer>
           <Table
@@ -330,10 +376,10 @@ export default function ProductTable() {
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={products?.length}
+              rowCount={orders?.length}
             />
             <TableBody>
-              {stableSort(products, getComparator(order, orderBy)).map(
+              {stableSort(orders, getComparator(order, orderBy)).map(
                 (row, index) => {
                   const isItemSelected = isSelected(row._id);
                   const labelId = `enhanced-table-checkbox-${index}`;
@@ -364,76 +410,53 @@ export default function ProductTable() {
                         id={labelId}
                         scope="row"
                         sx={{ p: 1 }}
-                        width="500px"
                       >
                         <Box
                           sx={{
                             display: "flex",
                             alignItems: "center",
-                            minWidth: "400px",
                           }}
                         >
-                          <Box
-                            sx={{
-                              width: "100px",
-                              height: "100px",
-                              display: "inline-block",
-                              mr: 2,
-                            }}
-                          >
-                            <img
-                              src={row?.imageUrls?.[0]}
-                              alt={row?.title}
-                              style={{ width: "100%", height: "100%" }}
-                            />
-                          </Box>
                           <Typography
-                            component={Link}
-                            to={`/detail/${row?._id}`}
                             variant="subtitle2"
                             color="initial"
                             sx={{ display: "inline-block", width: "70%" }}
                           >
-                            {row?.title}
+                            {row?._id}
                           </Typography>
                         </Box>
                       </TableCell>
-                      <TableCell align="left">
-                        <Typography variant="subtitle1" color="initial">
-                          {row?.categoryId?.title}
-                        </Typography>
+                      <TableCell align="right">
+                        <SeverityPill
+                          color={
+                            (row?.status === "delivered" && "success") ||
+                            (row?.status === "pending" && "info") ||
+                            (row?.status === "refunded" && "error") ||
+                            "warning"
+                          }
+                        >
+                          {row?.status}
+                        </SeverityPill>
                       </TableCell>
                       <TableCell align="right">
-                        <Stack direction="row" alignItems="center">
-                          <Rating
-                            name="rating"
-                            value={row?.rateAverage}
-                            precision={1}
-                            getLabelText={() => `${row?.totalRatings}`}
-                            size="small"
-                          />
-                          <Typography
-                            variant="subtitle2"
-                            noWrap
-                            color="text.disabled"
-                          >
-                            ({row?.totalRatings})
-                          </Typography>
-                        </Stack>
+                        <Typography variant="subtitle2" noWrap>
+                          {row?.userId.name}
+                        </Typography>
                       </TableCell>
                       <TableCell align="right">
                         <Typography
-                          variant="subtitle1"
-                          color="initial"
-                          sx={{
-                            color: "text.disabled",
-                            textDecoration: "line-through",
-                          }}
+                          variant="subtitle2"
+                          noWrap
+                          color="text.disabled"
                         >
-                          {fCurrency(row?.price)}
+                          {row?.createdAt && fDate(row?.createdAt)}
                         </Typography>
+                      </TableCell>
+                      <TableCell align="right">
                         <Typography variant="subtitle1" color="initial">
-                          {fCurrency(row?.priceSale)}
+                          {row?.createdAt &&
+                            row.shipping?.method &&
+                            addDays(row?.createdAt, +row.shipping?.method)}
                         </Typography>
                       </TableCell>
                       <TableCell align="right">
@@ -444,16 +467,13 @@ export default function ProductTable() {
                           spacing={1}
                         >
                           <Typography variant="subtitle1" color="initial">
-                            {fNumber(row?.quantity)}
+                            {labelMethodPayment[row?.payment?.method]}
                           </Typography>
                         </Stack>
                       </TableCell>
                       <TableCell align="right">
                         <Typography variant="subtitle1" color="initial">
-                          <Chip
-                            label={row?.isDeleted ? "Deactive" : "Active"}
-                            color={row?.isDeleted ? "error" : "info"}
-                          />
+                          {fCurrency(row?.payment?.total.total)}
                         </Typography>
                       </TableCell>
                     </TableRow>
@@ -476,7 +496,7 @@ export default function ProductTable() {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={totalProduct}
+          count={totalOrder}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
@@ -484,6 +504,36 @@ export default function ProductTable() {
           ActionsComponent={TablePaginationActions}
         />
       </Paper>
+      <CartSumTable products={productOrder} />
     </Box>
   );
+}
+
+function descendingComparator(a, b, orderBy) {
+  if (b[orderBy] < a[orderBy]) {
+    return -1;
+  }
+  if (b[orderBy] > a[orderBy]) {
+    return 1;
+  }
+  return 0;
+}
+
+function getComparator(order, orderBy) {
+  return order === "desc"
+    ? (a, b) => descendingComparator(a, b, orderBy)
+    : (a, b) => -descendingComparator(a, b, orderBy);
+}
+
+function stableSort(array, comparator) {
+  const stabilizedThis = array?.map((el, index) => [el, index]);
+  stabilizedThis.sort((a, b) => {
+    const order = comparator(a[0], b[0]);
+    if (order !== 0) {
+      return order;
+    }
+    return a[1] - b[1];
+  });
+
+  return stabilizedThis.map((el) => el[0]);
 }

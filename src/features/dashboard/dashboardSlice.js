@@ -6,13 +6,11 @@ import { cloudinaryUpload } from "../../utils/cloudinary";
 const initialState = {
   isLoading: false,
   error: null,
-  orders: [],
   reports: {},
   products: [],
   product: {},
   totalPageProduct: 1,
   totalProduct: 0,
-  totalPageOrder: 1,
   filters: {},
 };
 
@@ -36,7 +34,6 @@ const slice = createSlice({
     getProductDashBoardSuccess(state, action) {
       state.isLoading = false;
       state.error = null;
-
       state.product = action.payload;
     },
     getProductsDashboardSuccess(state, action) {
@@ -71,6 +68,11 @@ const slice = createSlice({
       state.error = null;
       state.filters = {};
     },
+    handleClearDashBoardFiltersOrder(state) {
+      state.isLoading = false;
+      state.error = null;
+      state.filtersOrder = {};
+    },
   },
 });
 
@@ -86,6 +88,7 @@ export const {
   updateProductDashBoardSuccess,
   handleClearDashBoardFilters,
   handleChangeDashBoardFilters,
+  handleClearDashBoardFiltersOrder,
   hasError,
 } = slice.actions;
 
@@ -126,10 +129,12 @@ export const getOrdersDashboard = (filters) => async (dispatch) => {
   }
 };
 
-export const getReportsDashboard = () => async (dispatch) => {
+export const getReportsDashboard = (filters) => async (dispatch) => {
   dispatch(startLoading());
   try {
-    const response = await apiService.get("/dashboard");
+    const response = await apiService.get("/dashboard", {
+      params: { ...filters },
+    });
 
     if (response) {
       dispatch(getReportsDashboardSuccess(response.data));
@@ -170,6 +175,7 @@ export const createProductDashboard = (data) => async (dispatch) => {
 
     if (response) {
       dispatch(createProductDashBoardSuccess(response.data));
+      toast.success("Create product Successfully");
     }
   } catch (error) {
     dispatch(hasError(error));
@@ -180,7 +186,6 @@ export const createProductDashboard = (data) => async (dispatch) => {
 export const updateProductDashboard = (id, data) => async (dispatch) => {
   dispatch(startLoading());
   try {
-    console.log(data);
     let imageUrl = [];
     await Promise.all(
       data.imageFile.map(async (file) => {
@@ -196,6 +201,7 @@ export const updateProductDashboard = (id, data) => async (dispatch) => {
 
     if (response) {
       dispatch(updateProductDashBoardSuccess());
+      toast.success("Update product Successfully");
     }
   } catch (error) {
     dispatch(hasError(error));

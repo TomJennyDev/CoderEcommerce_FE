@@ -27,3 +27,18 @@ export function addDays(date, days) {
   result.setDate(result.getDate() + days);
   return fDate(result);
 }
+
+export function getArrayLastDays(numberOfday, format = true, date) {
+  const offset_date = date ? new Date(date) : new Date();
+  const arrLast7Days = Array.from(Array(numberOfday).keys()).map(() => {
+    let date = offset_date.setDate(offset_date.getDate() - 1);
+    date = format ? fDate(date) : date;
+    return date;
+  });
+  return arrLast7Days;
+}
+
+export const setDateMDY = (dteSTR) => {
+  let [d, m, y] = dteSTR.split("-");
+  return new Date(`${m} ${d}, ${y} 00:00:00`);
+};

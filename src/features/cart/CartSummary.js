@@ -26,11 +26,11 @@ import CheckOutSumTable from "./CartSumTable";
 
 function CartSummary() {
   const dispatch = useDispatch();
-  const { products, cart, isLoading } = useSelector((state) => state.cart);
+  const { products, cart } = useSelector((state) => state.cart);
   const { shipping, payment } = cart;
   const navigate = useNavigate();
   const { user } = useAuth();
-  console.log(payment);
+
   const handleCheckout = () => {
     const order = {
       cartId: cart._id,
@@ -38,8 +38,9 @@ function CartSummary() {
       payment,
       products,
     };
+
     dispatch(createOrder(order));
-    navigate("/");
+    navigate("/order");
   };
   return (
     <Container>
@@ -48,7 +49,7 @@ function CartSummary() {
           <TitleStyle>
             <FactCheckIcon sx={{ width: "35px", height: "35px" }} />
             <Typography variant="h6" textAlign="left" sx={{ pl: 1 }}>
-              Order
+              Summary
             </Typography>
           </TitleStyle>
         </Stack>
@@ -190,7 +191,7 @@ function CartSummary() {
           </Grid>
         </Grid>
       </Stack>
-      <CheckOutSumTable />
+      <CheckOutSumTable products={products} />
     </Container>
   );
 }

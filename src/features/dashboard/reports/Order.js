@@ -9,9 +9,24 @@ import {
   Divider,
   useTheme,
 } from "@mui/material";
+import { addDays, isSameDay } from "date-fns";
 import { Bar } from "react-chartjs-2";
+import { getArrayLastDays, setDateMDY } from "../../../utils/formatTime";
+
 export default function Order(props) {
+  const { lastestOrders, rangeDays } = props;
   const theme = useTheme();
+
+  const checkDatesInRange = (date) => {
+    let result = lastestOrders?.find((order) =>
+      isSameDay(new Date(+date), setDateMDY(order.day))
+    );
+    if (!result) return 0;
+    return result.count;
+  };
+  const dataOrders = rangeDays.split(",")?.map((date) => {
+    return checkDatesInRange(date);
+  });
 
   const data = {
     datasets: [
@@ -20,23 +35,13 @@ export default function Order(props) {
         barPercentage: 0.5,
         barThickness: 15,
         borderRadius: 2,
-        categoryPercentage: 0.5,
-        data: [18, 5, 19, 27, 29, 19, 20],
-        label: "This year",
-        maxBarThickness: 10,
-      },
-      {
-        backgroundColor: "#EEEEEE",
-        barPercentage: 0.5,
-        barThickness: 15,
-        borderRadius: 2,
-        categoryPercentage: 0.5,
-        data: [11, 20, 12, 29, 30, 25, 13],
-        label: "Last year",
-        maxBarThickness: 10,
+        categoryPercentage: 1,
+        data: dataOrders.reverse(),
+        label: "number of Orders",
+        maxBarThickness: 30,
       },
     ],
-    labels: ["1 Aug", "2 Aug", "3 Aug", "4 Aug", "5 Aug", "6 Aug", "7 aug"],
+    labels: getArrayLastDays(7, true, addDays(new Date(), 1)).reverse(),
   };
 
   const options = {
@@ -89,7 +94,7 @@ export default function Order(props) {
   };
 
   return (
-    <Card {...props}>
+    <Card>
       <CardHeader
         action={
           <Button endIcon={<ArrowDropDownIcon fontSize="small" />} size="small">

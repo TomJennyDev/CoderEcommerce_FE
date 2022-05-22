@@ -1,9 +1,7 @@
 import { Container, Divider, Link, Stack } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { useDispatch } from "react-redux";
 import { NavLink } from "react-router-dom";
-import SearchHeader from "../../components/SearchHeader";
-import { handleChangeFilters } from "../product/productSlice";
+import useResponsive from "../../hooks/useResponsive";
 import CategoriesMenu from "./CategoryMenu";
 
 const StackStyled = styled(Stack)(({ theme }) => ({
@@ -15,11 +13,9 @@ const MenuItemstyled = styled(Link)(({ theme }) => ({
   cursor: "pointer",
 }));
 
-function CategoryBar(props) {
-  const dispatch = useDispatch();
+function CategoryBar() {
+  const upMd = useResponsive("up", "md");
 
-  const handleDispatch = (searchQuery) =>
-    dispatch(handleChangeFilters({ title: searchQuery }));
   return (
     <StackStyled alignItems="center" direction="row">
       <Container maxWidth="lg">
@@ -28,8 +24,8 @@ function CategoryBar(props) {
           justifyContent="space-between"
           alignItems="center"
         >
-          <CategoriesMenu />
-          <SearchHeader handleDispatch={handleDispatch} />
+          {upMd && <CategoriesMenu />}
+
           <Stack
             direction="row"
             spacing={2}
@@ -43,6 +39,9 @@ function CategoryBar(props) {
             </MenuItemstyled>
             <MenuItemstyled component={NavLink} to="/checkout">
               Checkout
+            </MenuItemstyled>
+            <MenuItemstyled component={NavLink} to="/order">
+              Order
             </MenuItemstyled>
           </Stack>
         </Stack>

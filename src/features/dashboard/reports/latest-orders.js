@@ -16,10 +16,11 @@ import { useEffect } from "react";
 import PerfectScrollbar from "react-perfect-scrollbar";
 import "react-perfect-scrollbar/dist/css/styles.css";
 import { useDispatch, useSelector } from "react-redux";
-import { getOrdersDashboard } from "../../../features/dashboard/dashboardSlice";
+import { Link } from "react-router-dom";
+import { SeverityPill } from "../../../components/severity-pill";
 import { fDate } from "../../../utils/formatTime";
 import { fCurrency } from "../../../utils/numberFormat";
-import { SeverityPill } from "../../severity-pill";
+import { getOrdersDashboard } from "../dashboardSlice";
 
 export default function LatestOrders(props) {
   const dispatch = useDispatch();
@@ -28,7 +29,7 @@ export default function LatestOrders(props) {
   useEffect(() => {
     const filter = { sortBy: "createdAt.desc" };
     dispatch(getOrdersDashboard(filter));
-  }, []);
+  }, [dispatch]);
   return (
     <Card>
       <CardHeader title="Latest Orders" />
@@ -64,6 +65,7 @@ export default function LatestOrders(props) {
                   <SeverityPill
                     color={
                       (order?.status === "delivered" && "success") ||
+                      (order?.status === "pending" && "info") ||
                       (order?.status === "refunded" && "error") ||
                       "warning"
                     }
@@ -85,6 +87,8 @@ export default function LatestOrders(props) {
       >
         <Button
           color="primary"
+          component={Link}
+          to={`/dashboard/order`}
           endIcon={<ArrowRightIcon fontSize="small" />}
           size="small"
           variant="text"

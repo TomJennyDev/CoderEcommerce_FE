@@ -1,8 +1,8 @@
-import AddCircleIcon from "@mui/icons-material/AddCircle";
-import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
-import DifferenceIcon from "@mui/icons-material/Difference";
+import CancelIcon from "@mui/icons-material/Cancel";
+import ClearAllIcon from "@mui/icons-material/ClearAll";
 import FilterListIcon from "@mui/icons-material/FilterList";
-import { Chip, Rating, Stack } from "@mui/material";
+import InfoIcon from "@mui/icons-material/Info";
+import { InputAdornment, Stack } from "@mui/material";
 import Box from "@mui/material/Box";
 import Checkbox from "@mui/material/Checkbox";
 import IconButton from "@mui/material/IconButton";
@@ -22,85 +22,64 @@ import Typography from "@mui/material/Typography";
 import { visuallyHidden } from "@mui/utils";
 import * as React from "react";
 import { useEffect } from "react";
+import { useForm } from "react-hook-form";
 import "react-perfect-scrollbar/dist/css/styles.css";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, NavLink } from "react-router-dom";
-import SearchInput from "../../../components/SearchInput";
-import TablePaginationActions from "../../../components/TablePaginationActions";
-import { fCurrency, fNumber } from "../../../utils/numberFormat";
-import ProductSort from "../../product/ProductSort";
+import { FormProvider, FSelect } from "../../components/form";
+import FMultiDatePicker from "../../components/form/FMultiDatePicker";
+import { SeverityPill } from "../../components/severity-pill";
+import TablePaginationActions from "../../components/TablePaginationActions";
+import useResponsive from "../../hooks/useResponsive";
+import { addDays, fDate } from "../../utils/formatTime";
+import { fCurrency } from "../../utils/numberFormat";
+import { labelMethodPayment } from "../cart/CartPayment";
+import CartSumTable from "../cart/CartSumTable";
+import { STATUS_ORDER } from "../dashboard/order/OrderTable";
 import {
-  getAllProductsDashboard,
-  handleChangeDashBoardFilters,
-} from "../dashboardSlice";
-
-function descendingComparator(a, b, orderBy) {
-  if (b[orderBy] < a[orderBy]) {
-    return -1;
-  }
-  if (b[orderBy] > a[orderBy]) {
-    return 1;
-  }
-  return 0;
-}
-
-function getComparator(order, orderBy) {
-  return order === "desc"
-    ? (a, b) => descendingComparator(a, b, orderBy)
-    : (a, b) => -descendingComparator(a, b, orderBy);
-}
-
-// This method is created for cross-browser compatibility, if you don't
-// need to support IE11, you can use Array.prototype.sort() directly
-function stableSort(array, comparator) {
-  const stabilizedThis = array?.map((el, index) => [el, index]);
-  stabilizedThis.sort((a, b) => {
-    const order = comparator(a[0], b[0]);
-    if (order !== 0) {
-      return order;
-    }
-    return a[1] - b[1];
-  });
-
-  return stabilizedThis.map((el) => el[0]);
-}
+  getOrderList,
+  getProductOrder,
+  handleChangeFilters,
+  handleClearFilters,
+  updateStatusOrderById,
+} from "./orderSlice";
 
 const headCells = [
   {
     id: "_id",
     aligns: "left",
     disablePadding: true,
-    label: "Product",
+    label: "Order Number",
   },
-  {
-    id: "category",
-    aligns: "left",
-    disablePadding: false,
-    label: "Category",
-  },
-  {
-    id: "rating",
-    aligns: "center",
-    disablePadding: false,
-    label: "Rating",
-  },
-  {
-    id: "price",
-    aligns: "right",
-    disablePadding: false,
-    label: "Price",
-  },
-  {
-    id: "quantity",
-    aligns: "right",
-    disablePadding: false,
-    label: "Quantity",
-  },
+
   {
     id: "status",
     aligns: "right",
     disablePadding: false,
     label: "Status",
+  },
+  {
+    id: "createdAt",
+    aligns: "right",
+    disablePadding: false,
+    label: "Place on",
+  },
+  {
+    id: "DeliveredAt",
+    aligns: "right",
+    disablePadding: false,
+    label: "Delivery on",
+  },
+  {
+    id: "payment",
+    aligns: "right",
+    disablePadding: false,
+    label: "Payment Method",
+  },
+  {
+    id: "total",
+    aligns: "right",
+    disablePadding: false,
+    label: "Total",
   },
 ];
 
@@ -157,101 +136,178 @@ function EnhancedTableHead(props) {
   );
 }
 
+const defaultValues = {
+  status: "",
+  delivery: [null, null],
+};
+
 const EnhancedTableToolbar = (props) => {
   const dispatch = useDispatch();
-  const { numSelected, selected, setSelected } = props;
-  const handleSubmit = (searchQuery) =>
-    dispatch(handleChangeDashBoardFilters({ title: searchQuery }));
-  const handleDispatch = (value) =>
-    dispatch(handleChangeDashBoardFilters(value));
+  const mdUp = useResponsive("up", "md");
+  const { numSelected, selected, setSelected, setPage } = props;
+  const { orders, filters } = useSelector((state) => state.order);
+
+  const isPending = orders.find(
+    (order) => order._id === selected[0] && order.status === "pending"
+  );
+
+  const methods = useForm({ defaultValues, mode: "onChange" });
+
+  const { handleSubmit, reset, watch } = methods;
+
+  useEffect(() => {
+    const subscription = watch((value) => {
+      let { delivery, ...restValue } = value;
+
+      let filters = {};
+      const deliveryStart = fDate(delivery[0]);
+      const deliveryEnd = fDate(delivery[1]);
+
+      filters = { ...restValue, deliveryEnd, deliveryStart };
+
+      dispatch(handleChangeFilters(filters));
+    });
+
+    return () => {
+      reset(defaultValues);
+      dispatch(handleClearFilters());
+      subscription.unsubscribe();
+    };
+  }, [watch, dispatch, reset]);
+
+  const onSubmit = (data) => null;
+
   return (
-    <Toolbar
-      sx={{
-        pl: { sm: 2 },
-        pr: { xs: 1, sm: 1 },
-        ...(numSelected > 0 && {
-          bgcolor: (theme) =>
-            alpha(
-              theme.palette.primary.main,
-              theme.palette.action.activatedOpacity
-            ),
-        }),
-      }}
-    >
-      {numSelected > 0 ? (
-        <Typography
-          sx={{ flex: "1 1 100%" }}
-          color="inherit"
-          variant="subtitle1"
-          component="div"
-        >
-          {numSelected} selected
-        </Typography>
-      ) : (
+    <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+      <Toolbar
+        sx={{
+          pl: { sm: 2 },
+          pr: { xs: 1, sm: 1 },
+          pt: 2,
+          width: "100%",
+          ...(numSelected > 0 && {
+            bgcolor: (theme) =>
+              alpha(
+                theme.palette.primary.main,
+                theme.palette.action.activatedOpacity
+              ),
+          }),
+        }}
+      >
         <Stack
-          direction="row"
+          sx={{ width: "100%" }}
+          direction={mdUp ? "row" : "column"}
+          justifyContent="space-between"
           alignItems="center"
-          sx={{ flex: "1 1 100%" }}
           spacing={2}
         >
-          <SearchInput handleSubmit={handleSubmit} />
-          <ProductSort handleDispatch={handleDispatch} />
+          {numSelected > 0 ? (
+            <Typography
+              sx={{ flex: "1 1 100%" }}
+              color="inherit"
+              variant="subtitle1"
+              component="div"
+            >
+              {numSelected} selected
+            </Typography>
+          ) : (
+            <Stack
+              direction={mdUp ? "row" : "column"}
+              alignItems="center"
+              sx={{
+                flex: "1 1 100%",
+              }}
+              spacing={2}
+            >
+              <FSelect
+                name="status"
+                label="status"
+                size="small"
+                sx={{ width: "250px" }}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <FilterListIcon />
+                    </InputAdornment>
+                  ),
+                }}
+              >
+                {STATUS_ORDER.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </FSelect>
+              <FMultiDatePicker
+                size="small"
+                name="delivery"
+                startText="Place-on-start"
+                endText="Place-on-end"
+              />
+            </Stack>
+          )}
+          <Stack direction="row">
+            <Tooltip title="Watch Product">
+              <IconButton
+                onClick={() => {
+                  if (numSelected > 0) {
+                    dispatch(getProductOrder(selected[0]));
+                  }
+                }}
+              >
+                <InfoIcon />
+              </IconButton>
+            </Tooltip>
+            {numSelected > 0 && isPending ? (
+              <Tooltip title="Cancel Order">
+                <IconButton
+                  onClick={() => {
+                    dispatch(
+                      updateStatusOrderById({
+                        orderId: selected[0],
+                        status: "cancel",
+                      })
+                    );
+                    setSelected([]);
+                  }}
+                >
+                  <CancelIcon />
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <>
+                <Tooltip title="Clear filter">
+                  <IconButton
+                    onClick={() => {
+                      setPage(0);
+                      reset(defaultValues);
+                      dispatch(handleClearFilters());
+                    }}
+                  >
+                    <ClearAllIcon />
+                  </IconButton>
+                </Tooltip>
+              </>
+            )}
+          </Stack>
         </Stack>
-      )}
-      {numSelected > 0 ? (
-        <Tooltip title="Clone Product">
-          <IconButton
-            component={NavLink}
-            to={`/dashboard/products/clone/${selected[0]}`}
-            onClick={() => setSelected([])}
-          >
-            <DifferenceIcon />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Add Product">
-          <IconButton
-            component={NavLink}
-            to={`/dashboard/products/add`}
-            onClick={() => setSelected([])}
-          >
-            <AddCircleIcon />
-          </IconButton>
-        </Tooltip>
-      )}
-
-      {numSelected > 0 ? (
-        <Tooltip title="Edit Product">
-          <IconButton
-            component={NavLink}
-            to={`/dashboard/products/edit/${selected[0]}`}
-            onClick={() => setSelected([])}
-          >
-            <AutoFixHighIcon />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <FilterListIcon />
-          </IconButton>
-        </Tooltip>
-      )}
-    </Toolbar>
+      </Toolbar>
+    </FormProvider>
   );
 };
 
-export default function ProductTable() {
-  const { products, totalProduct, filters } = useSelector(
-    (state) => state.dashboard
+export default function OrderList() {
+  const { orders, totalOrder, filters, productOrder } = useSelector(
+    (state) => state.order
   );
+
   const dispatch = useDispatch();
 
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("price");
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
-
+  const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
   const handleRequestSort = (event, property) => {
@@ -262,7 +318,7 @@ export default function ProductTable() {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelecteds = products.map((n) => n._id);
+      const newSelecteds = orders.map((n) => n._id);
       setSelected(newSelecteds);
 
       return;
@@ -303,12 +359,12 @@ export default function ProductTable() {
 
   // Avoid a layout jump when reaching the last page with empty products.
   const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - totalProduct) : 0;
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - totalOrder) : 0;
 
   useEffect(() => {
     const filters = { page: page + 1, limit: rowsPerPage };
-    dispatch(getAllProductsDashboard(filters));
-  }, [page, rowsPerPage, filters, dispatch]);
+    dispatch(getOrderList(filters));
+  }, [page, rowsPerPage, filters, productOrder]);
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -317,12 +373,13 @@ export default function ProductTable() {
           numSelected={selected.length}
           selected={selected}
           setSelected={setSelected}
+          setPage={setPage}
         />
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
             aria-labelledby="tableTitle"
-            size={"medium"}
+            size={dense ? "small" : "medium"}
           >
             <EnhancedTableHead
               numSelected={selected.length}
@@ -330,10 +387,10 @@ export default function ProductTable() {
               orderBy={orderBy}
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
-              rowCount={products?.length}
+              rowCount={orders?.length}
             />
             <TableBody>
-              {stableSort(products, getComparator(order, orderBy)).map(
+              {stableSort(orders, getComparator(order, orderBy)).map(
                 (row, index) => {
                   const isItemSelected = isSelected(row._id);
                   const labelId = `enhanced-table-checkbox-${index}`;
@@ -364,76 +421,48 @@ export default function ProductTable() {
                         id={labelId}
                         scope="row"
                         sx={{ p: 1 }}
-                        width="500px"
                       >
                         <Box
                           sx={{
                             display: "flex",
                             alignItems: "center",
-                            minWidth: "400px",
                           }}
                         >
-                          <Box
-                            sx={{
-                              width: "100px",
-                              height: "100px",
-                              display: "inline-block",
-                              mr: 2,
-                            }}
-                          >
-                            <img
-                              src={row?.imageUrls?.[0]}
-                              alt={row?.title}
-                              style={{ width: "100%", height: "100%" }}
-                            />
-                          </Box>
                           <Typography
-                            component={Link}
-                            to={`/detail/${row?._id}`}
                             variant="subtitle2"
                             color="initial"
                             sx={{ display: "inline-block", width: "70%" }}
                           >
-                            {row?.title}
+                            {row?._id}
                           </Typography>
                         </Box>
                       </TableCell>
-                      <TableCell align="left">
-                        <Typography variant="subtitle1" color="initial">
-                          {row?.categoryId?.title}
-                        </Typography>
-                      </TableCell>
                       <TableCell align="right">
-                        <Stack direction="row" alignItems="center">
-                          <Rating
-                            name="rating"
-                            value={row?.rateAverage}
-                            precision={1}
-                            getLabelText={() => `${row?.totalRatings}`}
-                            size="small"
-                          />
-                          <Typography
-                            variant="subtitle2"
-                            noWrap
-                            color="text.disabled"
-                          >
-                            ({row?.totalRatings})
-                          </Typography>
-                        </Stack>
+                        <SeverityPill
+                          color={
+                            (row?.status === "delivered" && "success") ||
+                            (row?.status === "pending" && "info") ||
+                            (row?.status === "refunded" && "error") ||
+                            "warning"
+                          }
+                        >
+                          {row?.status}
+                        </SeverityPill>
                       </TableCell>
                       <TableCell align="right">
                         <Typography
-                          variant="subtitle1"
-                          color="initial"
-                          sx={{
-                            color: "text.disabled",
-                            textDecoration: "line-through",
-                          }}
+                          variant="subtitle2"
+                          noWrap
+                          color="text.disabled"
                         >
-                          {fCurrency(row?.price)}
+                          {row?.createdAt && fDate(row?.createdAt)}
                         </Typography>
+                      </TableCell>
+                      <TableCell align="right">
                         <Typography variant="subtitle1" color="initial">
-                          {fCurrency(row?.priceSale)}
+                          {row?.createdAt &&
+                            row.shipping?.method &&
+                            addDays(row?.createdAt, +row.shipping?.method)}
                         </Typography>
                       </TableCell>
                       <TableCell align="right">
@@ -444,16 +473,13 @@ export default function ProductTable() {
                           spacing={1}
                         >
                           <Typography variant="subtitle1" color="initial">
-                            {fNumber(row?.quantity)}
+                            {labelMethodPayment[row?.payment?.method]}
                           </Typography>
                         </Stack>
                       </TableCell>
                       <TableCell align="right">
                         <Typography variant="subtitle1" color="initial">
-                          <Chip
-                            label={row?.isDeleted ? "Deactive" : "Active"}
-                            color={row?.isDeleted ? "error" : "info"}
-                          />
+                          {fCurrency(row?.payment?.total.total)}
                         </Typography>
                       </TableCell>
                     </TableRow>
@@ -463,7 +489,7 @@ export default function ProductTable() {
               {emptyRows > 0 && (
                 <TableRow
                   style={{
-                    height: 53 * emptyRows,
+                    height: (dense ? 33 : 53) * emptyRows,
                   }}
                 >
                   <TableCell colSpan={6} />
@@ -476,7 +502,7 @@ export default function ProductTable() {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={totalProduct}
+          count={totalOrder}
           rowsPerPage={rowsPerPage}
           page={page}
           onPageChange={handleChangePage}
@@ -484,6 +510,36 @@ export default function ProductTable() {
           ActionsComponent={TablePaginationActions}
         />
       </Paper>
+      <CartSumTable products={productOrder} />
     </Box>
   );
+}
+
+function descendingComparator(a, b, orderBy) {
+  if (b[orderBy] < a[orderBy]) {
+    return -1;
+  }
+  if (b[orderBy] > a[orderBy]) {
+    return 1;
+  }
+  return 0;
+}
+
+function getComparator(order, orderBy) {
+  return order === "desc"
+    ? (a, b) => descendingComparator(a, b, orderBy)
+    : (a, b) => -descendingComparator(a, b, orderBy);
+}
+
+function stableSort(array, comparator) {
+  const stabilizedThis = array?.map((el, index) => [el, index]);
+  stabilizedThis.sort((a, b) => {
+    const order = comparator(a[0], b[0]);
+    if (order !== 0) {
+      return order;
+    }
+    return a[1] - b[1];
+  });
+
+  return stabilizedThis.map((el) => el[0]);
 }

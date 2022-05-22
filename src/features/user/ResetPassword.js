@@ -3,7 +3,7 @@ import { LoadingButton } from "@mui/lab";
 import { Alert, Container, Link, Stack } from "@mui/material";
 import React from "react";
 import { useForm } from "react-hook-form";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import * as Yup from "yup";
 import { FormProvider, FTextField } from "../../components/form";
 import useAuth from "../../hooks/useAuth";
@@ -19,7 +19,6 @@ const defaultValues = {
 };
 
 function ResetPassword({ setCurrentTab }) {
-  const navigate = useNavigate();
   const location = useLocation();
   const auth = useAuth();
 
@@ -36,8 +35,7 @@ function ResetPassword({ setCurrentTab }) {
   } = methods;
 
   const onSubmit = async (data) => {
-    const from = location.state?.from?.pathname || "/";
-    let { email, password } = data;
+    let { email } = data;
 
     try {
       await auth.resetPassword({ email });

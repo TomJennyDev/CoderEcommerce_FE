@@ -10,7 +10,6 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { fCurrency, fNumber } from "../../utils/numberFormat";
 
@@ -34,10 +33,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-export default function CartSumTable() {
-  const { products, isLoading } = useSelector((state) => state.cart);
-  const dispatch = useDispatch();
-
+export default function CartSumTable({ products }) {
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 700 }} aria-label="table">
@@ -51,7 +47,7 @@ export default function CartSumTable() {
           </TableRow>
         </TableHead>
         <TableBody>
-          {products.map((row) => (
+          {products?.map((row) => (
             <StyledTableRow key={row.productId._id}>
               <StyledTableCell component="th" scope="row">
                 <Stack
@@ -63,6 +59,7 @@ export default function CartSumTable() {
                   <Box sx={{ maxWidth: "100px", height: "100%" }}>
                     <img
                       src={row?.productId?.imageUrls?.[0]}
+                      alt={row?.productId?.title}
                       style={{ width: "100%", height: "100%" }}
                     />
                   </Box>

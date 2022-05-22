@@ -23,8 +23,6 @@ function ProductUpLoadImg({ handleDrop, handleRemoveAll, handleRemove }) {
         name="imageUrls"
         control={control}
         render={({ field, fieldState: { error } }) => {
-          const checkError = !!error && field.value?.length === 0;
-          console.log(field);
           return (
             <MultiFilePreview
               showPreview

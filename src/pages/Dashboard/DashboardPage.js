@@ -1,22 +1,28 @@
 import { Box, Container, Grid } from "@mui/material";
+import { addDays } from "date-fns";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import LatestOrders from "../../components/dashboard/dashboard/latest-orders";
-import LatestProducts from "../../components/dashboard/dashboard/latest-products";
-import Order from "../../components/dashboard/dashboard/Order";
-import { Revenue } from "../../components/dashboard/dashboard/Revenue";
-import TotalCustomers from "../../components/dashboard/dashboard/TotalCustomers";
-import TotalOrder from "../../components/dashboard/dashboard/TotalOrder";
-import TotalProducts from "../../components/dashboard/dashboard/TotalProducts";
 import { getReportsDashboard } from "../../features/dashboard/dashboardSlice";
+import LatestOrders from "../../features/dashboard/reports/latest-orders";
+import LatestProducts from "../../features/dashboard/reports/latest-products";
+import Order from "../../features/dashboard/reports/Order";
+import { Revenue } from "../../features/dashboard/reports/Revenue";
+import TotalCustomers from "../../features/dashboard/reports/TotalCustomers";
+import TotalOrder from "../../features/dashboard/reports/TotalOrder";
+import TotalProducts from "../../features/dashboard/reports/TotalProducts";
+import { getArrayLastDays } from "../../utils/formatTime";
 
 export default function Dashboard() {
   const dispatch = useDispatch();
   const { reports } = useSelector((state) => state.dashboard);
 
+  const rangeDays = getArrayLastDays(7, false, addDays(new Date(), 1)).join(
+    ","
+  );
   useEffect(() => {
-    dispatch(getReportsDashboard());
-  }, []);
+    const filters = { rangeDays };
+    dispatch(getReportsDashboard(filters));
+  }, [dispatch]);
 
   return (
     <Box>
@@ -37,13 +43,16 @@ export default function Dashboard() {
               sx={{ height: "100%" }}
             />
           </Grid>
-          <Grid item lg={8} md={12} xl={12} xs={12}>
-            <Order />
+          <Grid item xl={12} lg={12} md={12} xs={12}>
+            <Order
+              lastestOrders={reports.lastestOrders}
+              rangeDays={rangeDays}
+            />
           </Grid>
-          <Grid item lg={4} md={6} xl={4} xs={12}>
+          <Grid item xl={4} lg={4} md={12} xs={12}>
             <LatestProducts sx={{ height: "100%" }} />
           </Grid>
-          <Grid item lg={8} md={12} xl={8} xs={12}>
+          <Grid item xl={8} lg={8} md={12} xs={12}>
             <LatestOrders />
           </Grid>
         </Grid>
