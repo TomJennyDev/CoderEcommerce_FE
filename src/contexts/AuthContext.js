@@ -181,7 +181,7 @@ function AuthProvider({ children }) {
 
   const resetPassword = async ({ email }, callback) => {
     const response = await apiService.post("/auth/resetpassword", { email });
-    if (response.ok) toast.success("Please check your email!");
+    if (response) toast.success("Please check your email!");
     callback();
   };
 

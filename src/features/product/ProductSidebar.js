@@ -58,7 +58,7 @@ export const FILTER_PRICE_OPTIONS = [
 
 const defaultValues = {
   price: [0, 1000000],
-  rating: 5,
+  rating: 1,
 };
 
 function ProductSidebar({ onCloseFilter, isOpenFilter }) {
