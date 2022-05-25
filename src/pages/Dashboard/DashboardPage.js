@@ -21,8 +21,17 @@ export default function Dashboard() {
   );
   useEffect(() => {
     const filters = { rangeDays };
-    dispatch(getReportsDashboard(filters));
+    const intervalId = setInterval(() => {
+      dispatch(getReportsDashboard(filters));
+    }, 5000);
+
+    return () => clearInterval(intervalId);
   }, [dispatch]);
+
+  useEffect(() => {
+    const filters = { rangeDays };
+    dispatch(getReportsDashboard(filters));
+  }, []);
 
   return (
     <Box>

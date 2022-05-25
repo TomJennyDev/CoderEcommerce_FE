@@ -1,6 +1,7 @@
 import SearchIcon from "@mui/icons-material/Search";
 import { IconButton, InputAdornment, TextField } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 function SearchInput({ handleSubmit }) {
   const [searchQuery, setSearchQuery] = useState("");
