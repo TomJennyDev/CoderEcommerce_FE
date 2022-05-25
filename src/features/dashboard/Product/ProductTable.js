@@ -314,6 +314,7 @@ export default function ProductTable() {
   useEffect(() => {
     const filters = { page: page + 1, limit: rowsPerPage };
     dispatch(getAllProductsDashboard(filters));
+    return () => dispatch(handleClearDashBoardFilters());
   }, [page, rowsPerPage, filters, dispatch]);
 
   return (

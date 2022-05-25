@@ -30,6 +30,17 @@ export default function LatestOrders(props) {
     const filter = { sortBy: "createdAt.desc" };
     dispatch(getOrdersDashboard(filter));
   }, [dispatch]);
+
+  useEffect(() => {
+    const filter = { sortBy: "createdAt.desc" };
+
+    const intervalId = setInterval(() => {
+      dispatch(getOrdersDashboard(filter));
+    }, 3000);
+
+    return () => clearInterval(intervalId);
+  }, [dispatch]);
+
   return (
     <Card>
       <CardHeader title="Latest Orders" />
