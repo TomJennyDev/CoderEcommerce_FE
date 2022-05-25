@@ -1,8 +1,7 @@
 import { Grid, Link } from "@mui/material";
 import { useSelector } from "react-redux";
-import { Link as RouterLink } from "react-router-dom";
 
-function CategoryList() {
+function CategoryList({ handleSetFilters }) {
   const { subCategories } = useSelector((state) => state.category);
   return (
     <Grid container>
@@ -10,7 +9,6 @@ function CategoryList() {
         return (
           <Grid item xs={4} md={4} key={subCateL2._id}>
             <Link
-              component={RouterLink}
               sx={{
                 cursor: "pointer",
                 textAlign: "center",
@@ -20,11 +18,14 @@ function CategoryList() {
                 fontSize: "1.3rem",
                 color: "text.primary",
               }}
-              to={`/category/${subCateL2._id}`}
+              onClick={() => handleSetFilters(subCateL2._id)}
             >
               {subCateL2?.title}
             </Link>
-            <SubCategoryChildL2 subCatesL3={subCateL2.children} />
+            <SubCategoryChildL2
+              subCatesL3={subCateL2.children}
+              handleSetFilters={handleSetFilters}
+            />
           </Grid>
         );
       })}
@@ -32,13 +33,12 @@ function CategoryList() {
   );
 }
 
-function SubCategoryChildL2({ subCatesL3 }) {
+function SubCategoryChildL2({ subCatesL3, handleSetFilters }) {
   return (
     <>
       {subCatesL3?.map((subCateL3) => {
         return (
           <Link
-            component={RouterLink}
             sx={{
               display: "block",
               cursor: "pointer",
@@ -47,7 +47,7 @@ function SubCategoryChildL2({ subCatesL3 }) {
               color: "text.primary",
             }}
             key={subCateL3._id}
-            to={`/category/${subCateL3._id}`}
+            onClick={() => handleSetFilters(subCateL3._id)}
           >
             {subCateL3.title}
           </Link>

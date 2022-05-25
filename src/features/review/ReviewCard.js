@@ -31,10 +31,14 @@ function ReviewCard({ review }) {
           <Rating
             name="read-only"
             value={valueRating}
-            precision={0.5}
+            precision={1}
             onChange={(event, newValue) => {
-              setRating(newValue);
-              dispatch(sendReviewReaction({ reviewId: _id, rate: +newValue }));
+              if (newValue) {
+                setRating(newValue);
+                dispatch(
+                  sendReviewReaction({ reviewId: _id, rate: +newValue })
+                );
+              }
             }}
             size="small"
           />

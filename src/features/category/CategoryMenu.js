@@ -158,7 +158,10 @@ export default function CategoriesMenu() {
         {categories?.map((cate, idx) => {
           return (
             <MenuItem
-              onClick={handleClose}
+              onClick={() => {
+                handleSetFilters(cate._id);
+                handleClose();
+              }}
               key={cate._id}
               aria-owns={open ? "mouse-over-popover" : undefined}
               aria-haspopup="true"
@@ -175,7 +178,6 @@ export default function CategoriesMenu() {
                   flexGrow: 1,
                   color: "inherit",
                 }}
-                onClick={() => handleSetFilters(cate._id)}
               >
                 {cate.title}
               </Typography>
@@ -198,7 +200,7 @@ export default function CategoriesMenu() {
           ref={ref}
           onMouseLeave={handleClose}
         >
-          <CategoryList />
+          <CategoryList handleSetFilters={handleSetFilters} />
         </Paper>
       )}
     </Container>
