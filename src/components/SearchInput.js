@@ -4,10 +4,18 @@ import React, { useState } from "react";
 
 function SearchInput({ handleSubmit }) {
   const [searchQuery, setSearchQuery] = useState("");
+  const { filters } = useSelector((state) => state.dashboard);
+
   const onSubmit = (e) => {
     e.preventDefault();
     handleSubmit(searchQuery);
   };
+
+  useEffect(() => {
+    if (filters.title) {
+      setSearchQuery("");
+    }
+  }, [filters.title]);
 
   return (
     <form onSubmit={onSubmit}>

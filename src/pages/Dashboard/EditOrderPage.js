@@ -10,7 +10,7 @@ import { TitleStyle } from "../../theme/customizations/TitleStyle";
 
 const defaultValues = {
   status: "",
-  statusUpdate: "",
+  statusUpdate: "pending",
   delivery: [null, null],
 };
 
@@ -34,6 +34,7 @@ export default function EditOrderPage() {
         filters
       )
     );
+    setSelected([]);
   };
 
   return (

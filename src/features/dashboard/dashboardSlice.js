@@ -68,11 +68,6 @@ const slice = createSlice({
       state.error = null;
       state.filters = {};
     },
-    handleClearDashBoardFiltersOrder(state) {
-      state.isLoading = false;
-      state.error = null;
-      state.filtersOrder = {};
-    },
   },
 });
 
@@ -88,7 +83,6 @@ export const {
   updateProductDashBoardSuccess,
   handleClearDashBoardFilters,
   handleChangeDashBoardFilters,
-  handleClearDashBoardFiltersOrder,
   hasError,
 } = slice.actions;
 

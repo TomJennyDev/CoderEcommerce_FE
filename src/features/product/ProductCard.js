@@ -9,7 +9,6 @@ import {
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { useState } from "react";
 import { FaAngleDoubleDown } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
@@ -52,15 +51,18 @@ export default function ProductCard({ product, isLoading }) {
     discount,
   } = product;
 
-  const [valueRating, setRating] = useState(rateAverage);
-
   function getLabelText() {
     return `(${totalRatings})`;
   }
   return (
     <Card>
       <Box
-        sx={{ pt: "100%", position: "relative", cursor: "pointer" }}
+        sx={{
+          pt: "100%",
+          position: "relative",
+          cursor: "pointer",
+          overflow: "hidden",
+        }}
         onClick={() => navigate(`/detail/${_id}`)}
       >
         <SkeletonLoading
@@ -130,13 +132,12 @@ export default function ProductCard({ product, isLoading }) {
             <Stack direction="row" alignItems="center" spacing={1}>
               <Rating
                 name="read-only"
-                value={valueRating}
+                value={rateAverage}
                 precision={1}
                 onChange={(event, newValue) => {
                   if (!isAuthenticated) {
                     toast.error(`Please login for rating!`);
-                  } else {
-                    setRating(newValue);
+                  } else if (newValue) {
                     dispatch(
                       sendReviewReaction({ productId: _id, rate: +newValue })
                     );

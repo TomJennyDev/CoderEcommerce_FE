@@ -142,11 +142,7 @@ function EnhancedTableHead(props) {
 const EnhancedTableToolbar = (props) => {
   const dispatch = useDispatch();
   const { numSelected, selected, setPage, reset, watch } = props;
-  const { orders, filters } = useSelector((state) => state.order);
-
-  const isPending = orders.find(
-    (order) => order._id === selected[0] && order.status === "pending"
-  );
+  const { orders } = useSelector((state) => state.order);
 
   useEffect(() => {
     const subscription = watch((value) => {

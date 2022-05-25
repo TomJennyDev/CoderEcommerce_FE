@@ -75,11 +75,18 @@ const headCells = [
     label: "Name",
   },
   {
+    id: "email",
+    numeric: true,
+    disablePadding: false,
+    label: "Email",
+  },
+  {
     id: "phone",
     numeric: true,
     disablePadding: false,
     label: "Phone",
   },
+
   {
     id: "role",
     numeric: true,
@@ -162,7 +169,7 @@ function EnhancedTableHead(props) {
 const EnhancedTableToolbar = (props) => {
   const dispatch = useDispatch();
   const { users } = useSelector((state) => state.user);
-  const { numSelected, selected, setSelected } = props;
+  const { numSelected, selected, setSelected, page, rowsPerPage } = props;
   const user = users.find((user) => user._id === selected[0] && user.isDeleted);
   const handleSubmit = (searchQuery) =>
     dispatch(handleChangeUserFilters({ name: searchQuery }));
@@ -200,7 +207,8 @@ const EnhancedTableToolbar = (props) => {
         <Tooltip title="Active User">
           <IconButton
             onClick={() => {
-              dispatch(updateUser(selected[0], { isDeleted: false }));
+              const filters = { page: page + 1, limit: rowsPerPage };
+              dispatch(updateUser(selected[0], { isDeleted: false }, filters));
               setSelected([]);
             }}
           >
@@ -213,7 +221,8 @@ const EnhancedTableToolbar = (props) => {
             <IconButton
               disabled={numSelected === 0}
               onClick={() => {
-                dispatch(deactiveUser(selected[0]));
+                const filters = { page: page + 1, limit: rowsPerPage };
+                dispatch(deactiveUser(selected[0], filters));
                 setSelected([]);
               }}
             >
@@ -309,6 +318,8 @@ export default function UserPage() {
           numSelected={selected.length}
           selected={selected}
           setSelected={setSelected}
+          page={page}
+          rowsPerPage={rowsPerPage}
         />
         <TableContainer>
           <Table
@@ -370,7 +381,11 @@ export default function UserPage() {
                             {user?.name}
                           </Typography>
                         </TableCell>
-
+                        <TableCell align="right">
+                          <Typography variant="subtitle1" color="initial">
+                            {user?.email}
+                          </Typography>
+                        </TableCell>
                         <TableCell align="right">
                           <Typography variant="subtitle1" color="initial">
                             {user?.phone}

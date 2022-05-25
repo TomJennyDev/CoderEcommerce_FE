@@ -11,6 +11,7 @@ const initialState = {
   users: [],
   totalPage: 0,
   totalUsers: 0,
+  currentPage: 1,
   filters: {},
 };
 
@@ -53,6 +54,7 @@ const slice = createSlice({
       state.error = null;
       state.totalUsers = action.payload.totalResults;
       state.users = action.payload.results;
+      state.currentPage = action.payload.page;
     },
     handleChangeUserFilters(state, action) {
       state.isLoading = false;
@@ -153,13 +155,13 @@ export const getUserList = (filters) => async (dispatch, getState) => {
   }
 };
 
-export const deactiveUser = (id) => async (dispatch) => {
+export const deactiveUser = (id, filters) => async (dispatch) => {
   dispatch(startLoading());
   try {
     const repsonse = await apiService.delete(`/users/delete/${id}`);
-    dispatch(getUserList());
     if (repsonse) {
       dispatch(deactiveUserSuccess());
+      dispatch(getUserList(filters));
     }
     toast.success("You are deactive user sucessfully!");
   } catch (error) {
@@ -168,16 +170,17 @@ export const deactiveUser = (id) => async (dispatch) => {
   }
 };
 
-export const updateUser = (id, updateContent) => async (dispatch) => {
+export const updateUser = (id, updateContent, filters) => async (dispatch) => {
   dispatch(startLoading());
   try {
     const repsonse = await apiService.put(`/users/update/${id}`, {
       ...updateContent,
     });
     if (repsonse) {
-      dispatch(getUserList());
-
       dispatch(updateUserSuccess());
+
+      dispatch(getUserList(filters));
+
       toast.success("You are updated user sucessfully!");
     }
   } catch (error) {

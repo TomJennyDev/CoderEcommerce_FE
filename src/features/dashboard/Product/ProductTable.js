@@ -1,7 +1,7 @@
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import AutoFixHighIcon from "@mui/icons-material/AutoFixHigh";
+import ClearAllIcon from "@mui/icons-material/ClearAll";
 import DifferenceIcon from "@mui/icons-material/Difference";
-import FilterListIcon from "@mui/icons-material/FilterList";
 import { Chip, Rating, Stack } from "@mui/material";
 import Box from "@mui/material/Box";
 import Checkbox from "@mui/material/Checkbox";
@@ -32,6 +32,7 @@ import ProductSort from "../../product/ProductSort";
 import {
   getAllProductsDashboard,
   handleChangeDashBoardFilters,
+  handleClearDashBoardFilters,
 } from "../dashboardSlice";
 
 function descendingComparator(a, b, orderBy) {
@@ -159,7 +160,7 @@ function EnhancedTableHead(props) {
 
 const EnhancedTableToolbar = (props) => {
   const dispatch = useDispatch();
-  const { numSelected, selected, setSelected } = props;
+  const { numSelected, selected, setSelected, setPage } = props;
   const handleSubmit = (searchQuery) =>
     dispatch(handleChangeDashBoardFilters({ title: searchQuery }));
   const handleDispatch = (value) =>
@@ -231,9 +232,14 @@ const EnhancedTableToolbar = (props) => {
           </IconButton>
         </Tooltip>
       ) : (
-        <Tooltip title="Filter list">
-          <IconButton>
-            <FilterListIcon />
+        <Tooltip title="Clear filter">
+          <IconButton
+            onClick={() => {
+              setPage(0);
+              dispatch(handleClearDashBoardFilters());
+            }}
+          >
+            <ClearAllIcon />
           </IconButton>
         </Tooltip>
       )}
@@ -317,6 +323,7 @@ export default function ProductTable() {
           numSelected={selected.length}
           selected={selected}
           setSelected={setSelected}
+          setPage={setPage}
         />
         <TableContainer>
           <Table

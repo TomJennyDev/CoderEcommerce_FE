@@ -110,7 +110,6 @@ export const getProduct = (id) => async (dispatch) => {
 export const sendReviewReaction =
   ({ productId, rate }) =>
   async (dispatch) => {
-    dispatch(startLoading());
     try {
       const response = await apiService.post(`/reaction`, {
         refPaths: "Products",

@@ -144,8 +144,9 @@ const defaultValues = {
 const EnhancedTableToolbar = (props) => {
   const dispatch = useDispatch();
   const mdUp = useResponsive("up", "md");
-  const { numSelected, selected, setSelected, setPage } = props;
-  const { orders, filters } = useSelector((state) => state.order);
+  const { numSelected, selected, setSelected, setPage, page, rowsPerPage } =
+    props;
+  const { orders } = useSelector((state) => state.order);
 
   const isPending = orders.find(
     (order) => order._id === selected[0] && order.status === "pending"
@@ -262,12 +263,17 @@ const EnhancedTableToolbar = (props) => {
               <Tooltip title="Cancel Order">
                 <IconButton
                   onClick={() => {
+                    const filters = { page: page + 1, limit: rowsPerPage };
                     dispatch(
-                      updateStatusOrderById({
-                        orderId: selected[0],
-                        status: "cancel",
-                      })
+                      updateStatusOrderById(
+                        {
+                          orderId: selected[0],
+                          status: "cancel",
+                        },
+                        filters
+                      )
                     );
+
                     setSelected([]);
                   }}
                 >
@@ -297,16 +303,15 @@ const EnhancedTableToolbar = (props) => {
 };
 
 export default function OrderList() {
-  const { orders, totalOrder, filters, productOrder } = useSelector(
-    (state) => state.order
-  );
+  const { orders, totalOrder, filters, productOrder, currentPage } =
+    useSelector((state) => state.order);
 
   const dispatch = useDispatch();
 
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("price");
   const [selected, setSelected] = React.useState([]);
-  const [page, setPage] = React.useState(0);
+  const [page, setPage] = React.useState(currentPage);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
@@ -362,9 +367,9 @@ export default function OrderList() {
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - totalOrder) : 0;
 
   useEffect(() => {
-    const filters = { page: page + 1, limit: rowsPerPage };
+    const filters = { page, limit: rowsPerPage };
     dispatch(getOrderList(filters));
-  }, [page, rowsPerPage, filters, productOrder]);
+  }, [dispatch, page, rowsPerPage, filters, productOrder]);
 
   return (
     <Box sx={{ width: "100%" }}>
@@ -374,6 +379,8 @@ export default function OrderList() {
           selected={selected}
           setSelected={setSelected}
           setPage={setPage}
+          page={page}
+          rowsPerPage={rowsPerPage}
         />
         <TableContainer>
           <Table

@@ -122,6 +122,8 @@ export const createOrder = (order) => async (dispatch) => {
     const response = await apiService.post("/order/me/create", { ...order });
     if (response) {
       dispatch(clearTotalProducts());
+      const filters = { page: 1, limit: 5 };
+      dispatch(getOrderList(filters));
       toast.success("Thank you for buy product at Coder eCommerce");
     }
   } catch (error) {
@@ -146,7 +148,7 @@ export const updateOrderDashboard = (order, filters) => async (dispatch) => {
 };
 
 export const updateStatusOrderById =
-  ({ orderId, status }) =>
+  ({ orderId, status }, filters) =>
   async (dispatch) => {
     dispatch(startLoading());
 
@@ -158,7 +160,7 @@ export const updateStatusOrderById =
 
       if (response) {
         dispatch(updateStatusOrderByIdSuccess());
-        dispatch(getOrderList());
+        dispatch(getOrderList(filters));
         toast.success("cancel Order Successfully");
       }
     } catch (error) {
