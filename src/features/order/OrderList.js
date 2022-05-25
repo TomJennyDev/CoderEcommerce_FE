@@ -40,7 +40,7 @@ import {
   getProductOrder,
   handleChangeFilters,
   handleClearFilters,
-  updateStatusOrderById,
+  updateStatusOrderById
 } from "./orderSlice";
 
 const headCells = [
@@ -303,7 +303,7 @@ const EnhancedTableToolbar = (props) => {
 };
 
 export default function OrderList() {
-  const { orders, totalOrder, filters, productOrder, currentPage } =
+  const { orders, totalOrder, filters, productOrder } =
     useSelector((state) => state.order);
 
   const dispatch = useDispatch();
@@ -311,7 +311,7 @@ export default function OrderList() {
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("price");
   const [selected, setSelected] = React.useState([]);
-  const [page, setPage] = React.useState(currentPage);
+  const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
@@ -367,7 +367,7 @@ export default function OrderList() {
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - totalOrder) : 0;
 
   useEffect(() => {
-    const filters = { page, limit: rowsPerPage };
+    const filters = { page: page + 1, limit: rowsPerPage };
     dispatch(getOrderList(filters));
   }, [dispatch, page, rowsPerPage, filters, productOrder]);
 
