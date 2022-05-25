@@ -1,6 +1,6 @@
 import { Divider, Paper, Stack, Typography } from "@mui/material";
 import { Box } from "@mui/system";
-import { useLayoutEffect } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import SkeletonLoading from "../../components/SkeletonLoading";
 import { fCurrency } from "../../utils/numberFormat";
@@ -9,7 +9,9 @@ import { updateCart } from "./cartSlice";
 function CartSideBar() {
   const dispatch = useDispatch();
 
-  const { cart, isLoading, products } = useSelector((state) => state.cart);
+  const { cart, isLoading, products, activeStep } = useSelector(
+    (state) => state.cart
+  );
 
   const calSubTotal = products.reduce(
     (acc, curr, index, arr) => {
@@ -24,13 +26,15 @@ function CartSideBar() {
     { subTotal: 0, shipping: 0, total: 0 }
   );
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const handleUpdateCart = () => {
       const cartUpdate = {
         ...cart,
         payment: { ...cart.payment, total: { ...calSubTotal, tax: 10 } },
       };
-      dispatch(updateCart(cartUpdate));
+      if (activeStep === 0) {
+        dispatch(updateCart(cartUpdate));
+      }
     };
     handleUpdateCart();
   }, [dispatch]);

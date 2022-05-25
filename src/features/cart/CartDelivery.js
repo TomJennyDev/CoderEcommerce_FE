@@ -144,6 +144,7 @@ function CartDelivery() {
                 type="submit"
                 variant="contained"
                 startIcon={<PaymentIcon />}
+                loading={isLoading || isSubmitting}
               >
                 Payment
               </Button>
