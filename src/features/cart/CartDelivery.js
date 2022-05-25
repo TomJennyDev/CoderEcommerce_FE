@@ -19,7 +19,7 @@ import * as yup from "yup";
 import { FormProvider, FRadioGroup, FTextField } from "../../components/form";
 import { TitleStyle } from "../../theme/customizations/TitleStyle";
 import CartSideBar from "./CartSideBar";
-import { updateCart } from "./cartSlice";
+import { setActiveStep, updateCart } from "./cartSlice";
 
 const DeliverySchema = yup.object().shape({
   email: yup.string().email().required("Email is required"),
@@ -46,33 +46,37 @@ const defaultData = {
   ward: "",
   address1: "",
   address2: "",
-  method: "1",
+  method: 1,
 };
 
-function CartDelivery({ setActiveStep }) {
+function CartDelivery() {
   const dispatch = useDispatch();
-  const { cart } = useSelector((state) => state.cart);
+  const { cart, isLoading, activeStep } = useSelector((state) => state.cart);
   const { shipping } = cart;
-  let defaultValues = shipping || defaultData;
+  let defaultValues = shipping;
 
   let methods = useForm({
     defaultValues,
     shouldUnregister: false,
     resolver: yupResolver(DeliverySchema),
   });
-  const { handleSubmit, reset } = methods;
+  const {
+    handleSubmit,
+    reset,
+    formState: { isSubmitting },
+  } = methods;
 
-  const onSubmit = (data) => {
-    const deliveryTime = addDays(new Date(), +data.method).toISOString();
+  const onSubmit = async (data) => {
+    const { method, ...restData } = data;
+    const deliveryTime = addDays(new Date(), +method).toISOString();
 
     const cartUpdate = {
       ...cart,
-      shipping: { ...data, deliveryTime },
+      shipping: { ...restData, deliveryTime, method: +method },
       status: "Delivery",
     };
-
-    dispatch(updateCart(cartUpdate));
-    setActiveStep((step) => step + 1);
+    await dispatch(updateCart(cartUpdate));
+    await dispatch(setActiveStep(activeStep + 1));
   };
 
   return (

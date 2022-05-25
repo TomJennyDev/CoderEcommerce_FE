@@ -29,7 +29,7 @@ export default function LatestOrders(props) {
   useEffect(() => {
     const filter = { sortBy: "createdAt.desc" };
     dispatch(getOrdersDashboard(filter));
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
     const filter = { sortBy: "createdAt.desc" };

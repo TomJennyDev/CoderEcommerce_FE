@@ -23,7 +23,7 @@ import {
 } from "../../components/form";
 import { TitleStyle } from "../../theme/customizations/TitleStyle";
 import CartSideBar from "./CartSideBar";
-import { updateCart } from "./cartSlice";
+import { setActiveStep, updateCart } from "./cartSlice";
 
 const PaymentSchema = yup.object().shape({
   method: yup.string(),
@@ -89,9 +89,9 @@ const defaultData = {
   cardCVV: "",
   cardIssuer: "American Express",
 };
-function CartPayment({ setActiveStep }) {
+function CartPayment() {
   const dispatch = useDispatch();
-  const { cart } = useSelector((state) => state.cart);
+  const { cart, isLoading, activeStep } = useSelector((state) => state.cart);
   const [method, setMethod] = useState(cart.payment?.method);
 
   let creditCards = cart.payment?.creditCards;
@@ -112,17 +112,18 @@ function CartPayment({ setActiveStep }) {
 
   const onSubmit = async (data) => {
     const { method, ...restData } = data;
+
     const creditCards = restData;
 
     let payment = { method, total: cart.payment.total };
+
     payment = creditCards.cardNumber ? { ...payment, creditCards } : payment;
     const cartUpdate = {
       ...cart,
       payment,
     };
     await dispatch(updateCart(cartUpdate));
-
-    setActiveStep((step) => step + 1);
+    dispatch(setActiveStep(activeStep + 1));
   };
 
   useEffect(() => {

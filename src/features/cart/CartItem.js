@@ -28,7 +28,11 @@ import { Link } from "react-router-dom";
 import { TitleStyle } from "../../theme/customizations/TitleStyle";
 import { fCurrency, fNumber } from "../../utils/numberFormat";
 import CartSideBar from "./CartSideBar";
-import { removeProductCart, updateQuantityProductCart } from "./cartSlice";
+import {
+  removeProductCart,
+  setActiveStep,
+  updateQuantityProductCart,
+} from "./cartSlice";
 
 const ButtonStyled = styled(Button)(({ theme }) => ({
   borderRadius: "50%",
@@ -158,8 +162,8 @@ function EnhancedTableHead(props) {
 
 const EnhancedTableToolbar = (props) => {
   const dispatch = useDispatch();
-  const { isLoading } = useSelector((state) => state.cart);
-  const { numSelected, selected, setSelected, setActiveStep } = props;
+  const { isLoading, activeStep } = useSelector((state) => state.cart);
+  const { numSelected, selected, setSelected } = props;
 
   return (
     <Toolbar
@@ -215,7 +219,7 @@ const EnhancedTableToolbar = (props) => {
         <Button
           variant="contained"
           onClick={() => {
-            setActiveStep((step) => step + 1);
+            dispatch(setActiveStep(activeStep + 1));
           }}
           startIcon={<LocalShippingIcon />}
         >
@@ -226,7 +230,7 @@ const EnhancedTableToolbar = (props) => {
   );
 };
 
-export default function CartDetail({ setActiveStep }) {
+export default function CartDetail() {
   const { products } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
 
@@ -294,7 +298,6 @@ export default function CartDetail({ setActiveStep }) {
           numSelected={selected.length}
           selected={selected}
           setSelected={setSelected}
-          setActiveStep={setActiveStep}
         />
         <TableContainer>
           <Table sx={{ minWidth: 750 }} aria-labelledby="tableTitle">

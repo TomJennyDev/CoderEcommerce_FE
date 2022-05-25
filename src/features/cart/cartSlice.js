@@ -9,6 +9,7 @@ const initialState = {
   products: [],
   totalProduct: 0,
   totalPage: 1,
+  activeStep: 0,
 };
 
 const slice = createSlice({
@@ -21,6 +22,9 @@ const slice = createSlice({
     hasError(state, action) {
       state.isLoading = false;
       state.error = action.payload;
+    },
+    setActiveStep(state, action) {
+      state.activeStep = action.payload;
     },
     getCartSuccess(state, action) {
       state.isLoading = false;
@@ -80,6 +84,7 @@ export const {
   removeProductCartSuccess,
   clearTotalProducts,
   hasError,
+  setActiveStep,
 } = slice.actions;
 
 export const getCart = () => async (dispatch) => {
@@ -96,7 +101,7 @@ export const getCart = () => async (dispatch) => {
   }
 };
 
-export const updateCart = (cart) => async (dispatch) => {
+export const updateCart = (cart) => async (dispatch, getState) => {
   dispatch(startLoading());
   try {
     const response = await apiService.put(`/cart/me/update`, { ...cart });

@@ -90,7 +90,7 @@ function CartSummary() {
                 {shipping &&
                   `${shipping?.address1}  
                   ${shipping?.ward} ward, 
-                  ${shipping?.district} district, 
+                  district ${shipping?.district}, 
                   ${shipping?.city} city.`}
               </Typography>
             </Stack>

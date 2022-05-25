@@ -9,46 +9,43 @@ import {
   Stepper,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link as RouterLink } from "react-router-dom";
 import CartDelivery from "../features/cart/CartDelivery";
 import CartDetail from "../features/cart/CartItem";
 import CartPayment from "../features/cart/CartPayment";
-import { getCart } from "../features/cart/cartSlice";
+import { getCart, setActiveStep } from "../features/cart/cartSlice";
 import CartSummary from "../features/cart/CartSummary";
 
 function CartPage() {
   const dispatch = useDispatch();
-  const { cart, products } = useSelector((state) => state.cart);
-  const [activeStep, setActiveStep] = useState(0);
+  const { products, activeStep } = useSelector((state) => state.cart);
 
   const handleStep = (step) => {
-    setActiveStep(step);
+    dispatch(setActiveStep(step));
   };
 
   const STEPS = [
     {
       value: "Cart",
       Cart: 0,
-      component: (
-        <CartDetail products={products} setActiveStep={setActiveStep} />
-      ),
+      component: <CartDetail products={products} />,
     },
     {
       value: "Delivery",
       Delivery: 1,
-      component: <CartDelivery setActiveStep={setActiveStep} />,
+      component: <CartDelivery />,
     },
     {
       value: "Payment",
       Payment: 2,
-      component: <CartPayment setActiveStep={setActiveStep} />,
+      component: <CartPayment />,
     },
     {
       value: "Summary",
       Summary: 3,
-      component: <CartSummary setActiveStep={setActiveStep} />,
+      component: <CartSummary />,
     },
   ];
 
