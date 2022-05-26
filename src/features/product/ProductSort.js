@@ -20,7 +20,7 @@ const defaultValues = {
 };
 export default function ProductSort({ handleDispatch }) {
   const { filters } = useSelector((state) => state.product);
-
+  console.log(filters);
   const methods = useForm({ defaultValues, mode: "onChange" });
   const { handleSubmit, reset, watch } = methods;
 
@@ -30,7 +30,7 @@ export default function ProductSort({ handleDispatch }) {
     }
     const subscription = watch((value) => handleDispatch(value));
     return () => subscription.unsubscribe();
-  }, [watch, filters.sortBy]);
+  }, [watch]);
 
   const onSubmit = (data) => console.log(data);
 

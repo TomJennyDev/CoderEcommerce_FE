@@ -55,10 +55,11 @@ export default function ProductCard({ product, isLoading }) {
     return `(${totalRatings})`;
   }
   return (
-    <Card>
+    <Card sx={{ height: "100%" }}>
       <Box
         sx={{
           pt: "100%",
+
           position: "relative",
           cursor: "pointer",
           overflow: "hidden",

@@ -6,7 +6,6 @@ import {
   ListItemIcon,
   ListItemText,
 } from "@mui/material";
-// material
 import { alpha, styled, useTheme } from "@mui/material/styles";
 import PropTypes from "prop-types";
 import { useState } from "react";
@@ -15,10 +14,7 @@ import {
   NavLink as RouterLink,
   useLocation,
 } from "react-router-dom";
-//
 import Iconify from "./Iconify";
-
-// ----------------------------------------------------------------------
 
 const ListItemStyle = styled((props) => (
   <ListItemButton disableGutters {...props} />
@@ -39,13 +35,6 @@ const ListItemIconStyle = styled(ListItemIcon)({
   alignItems: "center",
   justifyContent: "center",
 });
-
-// ----------------------------------------------------------------------
-
-NavItem.propTypes = {
-  item: PropTypes.object,
-  active: PropTypes.func,
-};
 
 function NavItem({ item, active }) {
   const theme = useTheme();
