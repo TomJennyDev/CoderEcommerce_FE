@@ -36,7 +36,7 @@ export default function LatestOrders(props) {
 
     const intervalId = setInterval(() => {
       dispatch(getOrdersDashboard(filter));
-    }, 3000);
+    }, 5000);
 
     return () => clearInterval(intervalId);
   }, [dispatch]);

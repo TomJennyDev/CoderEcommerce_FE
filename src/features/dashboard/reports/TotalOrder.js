@@ -33,7 +33,7 @@ export default function TotalOrder({ totalOrders }) {
               TOTAL ODERS
             </Typography>
             <Typography color="textPrimary" variant="h4">
-              {orderCurrent?.count}
+              {fNumber(orderCurrent?.count)}
             </Typography>
           </Grid>
           <Grid item>
