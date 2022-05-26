@@ -20,7 +20,6 @@ const defaultValues = {
 };
 export default function ProductSort({ handleDispatch }) {
   const { filters } = useSelector((state) => state.product);
-  console.log(filters);
   const methods = useForm({ defaultValues, mode: "onChange" });
   const { handleSubmit, reset, watch } = methods;
 
