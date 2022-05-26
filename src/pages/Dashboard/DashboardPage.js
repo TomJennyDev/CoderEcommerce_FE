@@ -23,7 +23,7 @@ export default function Dashboard() {
     const filters = { rangeDays };
     const intervalId = setInterval(() => {
       dispatch(getReportsDashboard(filters));
-    }, 5000);
+    }, 3000);
 
     return () => clearInterval(intervalId);
   }, [dispatch]);
