@@ -10,6 +10,7 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Typography from "@mui/material/Typography";
 import * as React from "react";
+import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { fCurrency, fNumber } from "../../utils/numberFormat";
 
@@ -34,6 +35,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 export default function CartSumTable({ products }) {
+  const dispatch = useDispatch();
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 700 }} aria-label="table">

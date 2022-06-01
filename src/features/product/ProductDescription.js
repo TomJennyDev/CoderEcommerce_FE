@@ -10,23 +10,23 @@ const ButtonDescriptions = styled(Button)(({ theme }) => ({
   // backgroundColor: alpha(theme.palette.primary.main, 0.5),
 }));
 
+const DescriptionsContainer = styled(Box)(({ theme, show }) => ({
+  maxHeight: show ? "auto" : "80vh",
+  overflowY: "hidden",
+  position: "relative",
+  width: "100%",
+  transition: theme.transitions.create("all", {
+    easing: theme.transitions.easing.easeInOut,
+    duration: theme.transitions.duration.default,
+  }),
+}));
+
 function ProductDescription() {
   const { product } = useSelector((state) => state.product);
-  const ref = useRef();
+  const { descriptions } = product;
+  const ref = useRef(0);
   const [show, setShow] = useState(false);
   const [showButton, setShowButton] = useState(false);
-
-  const DescriptionsContainer = styled(Box)(({ theme }) => ({
-    height: show && showButton ? "auto" : "80vh",
-    overflowY: "hidden",
-
-    position: "relative",
-    width: "100%",
-    transition: theme.transitions.create("all", {
-      easing: theme.transitions.easing.easeInOut,
-      duration: theme.transitions.duration.default,
-    }),
-  }));
 
   useEffect(() => {
     if (ref.current.clientHeight < ref.current.scrollHeight) {
@@ -34,13 +34,13 @@ function ProductDescription() {
     } else {
       setShowButton(false);
     }
-  }, [ref.current?.clientHeight, product]);
+  }, [ref.current?.clientHeight, descriptions?.content]);
 
   return (
-    <DescriptionsContainer ref={ref}>
+    <DescriptionsContainer ref={ref} show={show} showButton={showButton}>
       <ReactMarkdown
         rehypePlugins={[rehypeRaw]}
-        children={product?.descriptions?.content}
+        children={descriptions?.content}
       />
       {showButton && (
         <Box

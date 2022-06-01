@@ -18,7 +18,7 @@ import SkeletonLoading from "../../components/SkeletonLoading";
 import useAuth from "../../hooks/useAuth";
 import { fCurrency } from "../../utils/numberFormat";
 import { updateQuantityProductCart } from "../cart/cartSlice";
-import { sendReviewReaction } from "./productSlice";
+import { getProduct, sendReviewReaction } from "./productSlice";
 
 const ProductImgStyle = styled("img")(({ theme }) => ({
   width: "50%",
@@ -33,6 +33,34 @@ const ProductImgStyle = styled("img")(({ theme }) => ({
   "&:hover": {
     transform: "translate(-50%,-50%) scale(1.05)",
   },
+}));
+
+const StatusLabel = styled(Label)(({ theme, status }) => ({
+  zIndex: 9,
+  top: 16,
+  right: 16,
+  position: "absolute",
+  textTransform: "uppercase",
+  color: "white",
+  boxShadow: 2,
+  p: 1,
+  background:
+    status === "sale"
+      ? "linear-gradient(to right, #f12711, #f5af19)"
+      : "linear-gradient(to left, #009fff, #ec2f4b)",
+}));
+
+const SaleLabel = styled(Label)(({ theme }) => ({
+  zIndex: 9,
+  top: 16,
+  left: 16,
+  position: "absolute",
+  textTransform: "uppercase",
+  color: "white",
+  boxShadow: 3,
+
+  fontSize: "1rem",
+  background: "linear-gradient(45deg, #12c2e9, #c471ed, #f64f59)",
 }));
 
 export default function ProductCard({ product, isLoading }) {
@@ -51,79 +79,56 @@ export default function ProductCard({ product, isLoading }) {
     discount,
   } = product;
 
-  function getLabelText() {
+  const getLabelText = () => {
     return `(${totalRatings})`;
-  }
+  };
   return (
-    <Card sx={{ height: "100%" }}>
-      <Box
-        sx={{
-          pt: "100%",
-
-          position: "relative",
-          cursor: "pointer",
-          overflow: "hidden",
-        }}
-        onClick={() => navigate(`/detail/${_id}`)}
-      >
+    <Card sx={{ height: "100%", p: 0, m: 0 }}>
+      {isLoading ? (
         <SkeletonLoading
           isLoading={isLoading}
-          style={{ width: "100%", minHeight: "270px" }}
+          style={{ width: "100%", pt: "100%" }}
+        />
+      ) : (
+        <Box
+          sx={{
+            pt: "100%",
+            position: "relative",
+            cursor: "pointer",
+            overflow: "hidden",
+          }}
+          onClick={() => {
+            navigate(`/detail/${_id}`);
+          }}
         >
           {status && (
-            <Label
-              variant="filled"
-              sx={{
-                zIndex: 9,
-                top: 16,
-                right: 16,
-                position: "absolute",
-                textTransform: "uppercase",
-                color: "white",
-                boxShadow: 2,
-                p: 1,
-                background:
-                  status === "sale"
-                    ? "linear-gradient(to right, #f12711, #f5af19)"
-                    : "linear-gradient(to left, #009fff, #ec2f4b)",
-              }}
-            >
+            <StatusLabel variant="filled" status={status}>
               {status}
-            </Label>
+            </StatusLabel>
           )}
 
           {status === "sale" && (
-            <Label
-              variant="filled"
-              sx={{
-                zIndex: 9,
-                top: 16,
-                left: 16,
-                position: "absolute",
-                textTransform: "uppercase",
-                color: "white",
-                boxShadow: 3,
-
-                fontSize: "1rem",
-                background: "linear-gradient(45deg, #12c2e9, #c471ed, #f64f59)",
-              }}
-            >
+            <SaleLabel variant="filled">
               {discount + "%"}
               <FaAngleDoubleDown />
-            </Label>
+            </SaleLabel>
           )}
 
           <ProductImgStyle alt={title} src={imageUrls[0]} />
-        </SkeletonLoading>
-      </Box>
+        </Box>
+      )}
 
       <Stack spacing={1} sx={{ p: 2 }}>
-        {isLoading && (
+        {isLoading ? (
           <SkeletonLoading isLoading={isLoading} count={3} width="100%" />
-        )}
-        {!isLoading && (
+        ) : (
           <>
-            <Link to={`/detail/${_id}`} color="inherit" component={RouterLink}>
+            <Link
+              to={`/detail/${_id}`}
+              color="inherit"
+              component={RouterLink}
+              onClick={() => dispatch(getProduct(_id))}
+            >
               <Typography variant="subtitle2" noWrap>
                 <SkeletonLoading isLoading={isLoading} height="100%">
                   {title}

@@ -26,6 +26,7 @@ export default function LatestProducts(props) {
     const filter = { sortBy: "createdAt.desc" };
     dispatch(getAllProductsDashboard(filter));
   }, [dispatch]);
+
   return (
     <Card {...props}>
       <CardHeader

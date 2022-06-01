@@ -15,14 +15,18 @@ import {
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/system";
-import React, { useLayoutEffect, useState } from "react";
-import { shallowEqual, useDispatch, useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link as RouterLink, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import { REACT_APP_LIMIT } from "../app/config";
 import { default as SkeletonLoading } from "../components/SkeletonLoading";
 import { updateQuantityProductCart } from "../features/cart/cartSlice";
 import ProductSimilar from "../features/product/ProductSimilar";
-import { getProduct } from "../features/product/productSlice";
+import {
+  getProduct,
+  handleClearProduct,
+} from "../features/product/productSlice";
 import ProductTabs from "../features/product/ProductTabs";
 import useAuth from "../hooks/useAuth";
 import { fCurrency } from "../utils/numberFormat";
@@ -73,20 +77,32 @@ const ProductImgChildStyle = styled("img")(({ theme }) => ({
   },
 }));
 function DetailPage() {
+  const dispatch = useDispatch();
+
   const { isAuthenticated } = useAuth();
   const params = useParams();
   const { id } = params;
-  const dispatch = useDispatch();
+  let { product, error, isLoading } = useSelector((state) => state.product);
+  const {
+    title,
+    imageUrls,
+    status,
+    totalRatings,
+    rateAverage,
+    inventoryStatus,
+    categoryId,
+    price,
+    priceSale,
+  } = product;
+  const [page, setPage] = useState(1);
 
   const [imgUrl, setImgUrl] = useState(0);
 
-  let { product, error, isLoading } = useSelector(
-    (state) => state.product,
-    shallowEqual
-  );
+  useEffect(() => {
+    let filters = { page, limit: Number(REACT_APP_LIMIT), id };
+    dispatch(getProduct(id, filters));
 
-  useLayoutEffect(() => {
-    dispatch(getProduct(id));
+    return () => dispatch(handleClearProduct());
   }, [id, dispatch]);
 
   return (
@@ -96,9 +112,7 @@ function DetailPage() {
           Coder eCommerce
         </Link>
         <Typography color="text.primary">
-          {product?.title?.length > 50
-            ? product?.title?.slice(0, 50) + "..."
-            : product?.title}
+          {title?.length > 50 ? title?.slice(0, 50) + "..." : title}
         </Typography>
       </Breadcrumbs>
       <Box sx={{ position: "relative", height: 1, minHeight: "500px" }}>
@@ -119,10 +133,7 @@ function DetailPage() {
                     width="100%"
                   >
                     <ContainerImage>
-                      <ProductImgStyle
-                        alt={product?.title}
-                        src={product?.imageUrls?.[imgUrl]}
-                      />
+                      <ProductImgStyle alt={title} src={imageUrls?.[imgUrl]} />
                     </ContainerImage>
                   </SkeletonLoading>
                   <Stack
@@ -131,7 +142,7 @@ function DetailPage() {
                     spacing={2}
                     justifyContent="center"
                   >
-                    {product?.imageUrls?.slice(0, 3).map((img, idx) => {
+                    {imageUrls?.slice(0, 3).map((img, idx) => {
                       return (
                         <ContainerChildImage
                           onClick={() => setImgUrl(idx)}
@@ -143,10 +154,7 @@ function DetailPage() {
                             height="80px"
                           >
                             {!isLoading ? (
-                              <ProductImgChildStyle
-                                alt={product?.title}
-                                src={img}
-                              />
+                              <ProductImgChildStyle alt={title} src={img} />
                             ) : null}
                           </SkeletonLoading>
                         </ContainerChildImage>
@@ -164,12 +172,12 @@ function DetailPage() {
                   >
                     <Chip
                       avatar={<NewReleasesIcon />}
-                      label={product?.status}
+                      label={status}
                       sx={{
                         mt: 2,
                         mb: 1,
                         background:
-                          product?.status === "sale"
+                          status === "sale"
                             ? "linear-gradient(to right, #f12711, #f5af19)"
                             : "linear-gradient(to left, #009fff, #ec2f4b)",
                         textTransform: "uppercase",
@@ -183,7 +191,7 @@ function DetailPage() {
                   </SkeletonLoading>
                   <Typography variant="h5" paragraph>
                     <SkeletonLoading isLoading={isLoading}>
-                      {product?.title}
+                      {title}
                     </SkeletonLoading>
                   </Typography>
                   <Stack
@@ -194,8 +202,9 @@ function DetailPage() {
                   >
                     <SkeletonLoading isLoading={isLoading}>
                       <Rating
-                        value={product?.rateAverage}
-                        precision={0.1}
+                        name="read-only"
+                        value={rateAverage || null}
+                        precision={1}
                         readOnly
                       />
 
@@ -203,7 +212,7 @@ function DetailPage() {
                         variant="body2"
                         sx={{ color: "text.secondary" }}
                       >
-                        ({product?.totalRatings} reviews)
+                        ({totalRatings} reviews)
                       </Typography>
                     </SkeletonLoading>
                   </Stack>
@@ -216,9 +225,9 @@ function DetailPage() {
                           textDecoration: "line-through",
                         }}
                       >
-                        {product?.price && fCurrency(product?.price)}
+                        {price && fCurrency(price)}
                       </Box>
-                      &nbsp;{fCurrency(product?.priceSale)}
+                      &nbsp;{fCurrency(priceSale)}
                     </SkeletonLoading>
                   </Typography>
 
@@ -227,7 +236,7 @@ function DetailPage() {
                       <SkeletonLoading isLoading={isLoading}>
                         <Chip
                           //   avatar={<NewReleasesIcon />}
-                          label={product?.inventoryStatus}
+                          label={inventoryStatus}
                           sx={{
                             mt: 2,
                             mb: 1,
@@ -258,7 +267,7 @@ function DetailPage() {
                             );
                           }
                         }}
-                        disabled={product?.inventoryStatus !== "available"}
+                        disabled={inventoryStatus !== "available"}
                         startIcon={<ShoppingCartIcon />}
                       >
                         Add to Cart
@@ -272,7 +281,7 @@ function DetailPage() {
         )}
       </Box>
       <ProductTabs productId={id} />
-      <ProductSimilar categoryId={product?.categoryId} />
+      <ProductSimilar categoryId={categoryId} />
     </Container>
   );
 }

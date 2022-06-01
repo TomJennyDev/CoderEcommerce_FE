@@ -24,6 +24,7 @@ export default function Order(props) {
     if (!result) return 0;
     return result.count;
   };
+
   const dataOrders = rangeDays.split(",")?.map((date) => {
     return checkDatesInRange(date);
   });
@@ -38,7 +39,7 @@ export default function Order(props) {
         categoryPercentage: 1,
         data: dataOrders.reverse(),
         label: "number of Orders",
-        maxBarThickness: 30,
+        maxBarThickness: 60,
       },
     ],
     labels: getArrayLastDays(7, true, addDays(new Date(), 1)).reverse(),

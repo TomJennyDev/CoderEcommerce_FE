@@ -7,34 +7,31 @@ import {
   Card,
   CardContent,
   Grid,
+  Stack,
   Typography,
 } from "@mui/material";
+import calTotalReports from "../../../utils/calReport";
 import { fNumber } from "../../../utils/numberFormat";
-
 export default function TotalOrder({ totalOrders }) {
-  const date = new Date();
-  const curentMonth = date.getMonth() + 1;
-
-  const orderCurrent = totalOrders?.reduce((acc, curr, idx, arr) => {
-    if (curr.month === curentMonth) acc.count = curr?.count;
-    if (curr.month === curentMonth - 1) acc.countLastMonth = curr?.count;
-    if (arr.length - 1 === idx) {
-      acc.percent = (acc.count * 100) / acc.countLastMonth;
-    }
-    return acc;
-  }, {});
-
+  const results = calTotalReports(totalOrders, "count");
   return (
     <Card sx={{ height: "100%" }}>
       <CardContent>
-        <Grid container spacing={3} sx={{ justifyContent: "space-between" }}>
+        <Grid container spacing={1} sx={{ justifyContent: "space-between" }}>
           <Grid item>
             <Typography color="textSecondary" gutterBottom variant="overline">
               TOTAL ODERS
             </Typography>
-            <Typography color="textPrimary" variant="h4">
-              {fNumber(orderCurrent?.count)}
-            </Typography>
+            <Stack direction="row" alignItems="flex-end" spacing={1}>
+              <Typography color="textPrimary" variant="h4">
+                {fNumber(results?.count)}
+              </Typography>
+              {results?.totalLastMonth && (
+                <Typography color="textPrimary" variant="body">
+                  /{results?.totalLastMonth}
+                </Typography>
+              )}
+            </Stack>
           </Grid>
           <Grid item>
             <Avatar
@@ -55,7 +52,7 @@ export default function TotalOrder({ totalOrders }) {
             alignItems: "center",
           }}
         >
-          {orderCurrent?.countLastMonth > orderCurrent?.count ? (
+          {results?.totalLastMonth > results?.count ? (
             <ArrowDownwardIcon color="error" />
           ) : (
             <ArrowUpwardIcon color="success" />
@@ -63,16 +60,14 @@ export default function TotalOrder({ totalOrders }) {
 
           <Typography
             color={
-              orderCurrent?.countLastMonth > orderCurrent?.count
-                ? "error"
-                : "success"
+              results?.totalLastMonth > results?.count ? "error" : "success"
             }
             sx={{
               mr: 1,
             }}
             variant="body2"
           >
-            {fNumber(orderCurrent?.percent)} %
+            {fNumber(results?.percent)} %
           </Typography>
           <Typography color="textSecondary" variant="caption">
             Since last month

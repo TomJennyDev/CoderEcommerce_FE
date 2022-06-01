@@ -2,13 +2,11 @@
 
 ## Description
 
-A social platform web application built with MERN stack. This is the codebase for the MongoDB NodeJS and Express RESTful backend API.
-
-This is the solution for the full-stack web dev course @CoderSchoolVn
+Ecommerce Platform web application built with MERN stack. This is the codebase for the MongoDB NodeJS and Express RESTful backend API.
 
 ## Features
 
-This include all common features of a Social Platform.
+This include all common features of a Ecommerce Platform.
 
 ### User authentication and managing account (UserFlow)
 
@@ -76,10 +74,6 @@ This include all common features of a Social Platform.
 
 ## Production API
 
-- [Doc](https://app.swaggerhub.com/apis-docs/dhminh1024/CoderComm/1.0.0#/Reaction/createReaction)
-
-- [App demo](https://codercomm-dot-cs-platform-306304.et.r.appspot.com/)
-
 ## Project setup
 
 1. Generate express boiler plate
@@ -110,13 +104,6 @@ This include all common features of a Social Platform.
 
 4. Environment variable config (JSK, MURI)
    In `.env`
-
-   ```txt
-    JWT_SECRET_KEY=someKey
-    MONGO_DEV_URI=mongodb://locahost:27017/
-    MONGO_PRO_URI=mongodb_srv://atlas.com/
-   ```
-
    In `.gitignore`
 
    ```txt
