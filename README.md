@@ -1,4 +1,4 @@
-# social-platform-mongo-express
+# coder-ecommerce-platform-mongo-express
 
 ## Description
 
