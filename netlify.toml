@@ -2,3 +2,9 @@
   from = "/*"
   to = "/"
   status = 200
+[[redirects]]
+  from = "/v1/*"
+  to = "http://nodejs.eba-rjipxut7.ap-southeast-1.elasticbeanstalk.com"
+  status = 200
+  force = true # COMMENT: ensure that we always redirect
+  headers = {X-From = "Netlify"}
