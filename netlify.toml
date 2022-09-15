@@ -3,7 +3,7 @@
   to = "/"
   status = 200
 [[redirects]]
-  from = "/v1/*"
+  from = "https://nodejs.eba-rjipxut7.ap-southeast-1.elasticbeanstalk.com/v1/*"
   to = "http://nodejs.eba-rjipxut7.ap-southeast-1.elasticbeanstalk.com/v1/:splat"
   status = 200
   force = true # COMMENT: ensure that we always redirect
